@@ -28,6 +28,9 @@
 
 
 
+(defun maplinha (linha)
+	(- 17 linha))
+
 
 ; TAI - tabuleiro
 ; Representacao interna : Uma lista que ira conter todas as linhas do jogo, assim tem 18 posicoes.
@@ -51,6 +54,24 @@
       		  		(setf (aref novo-tabuleiro nlinha ncoluna) (aref tabuleiro-a-copiar nlinha ncoluna))))
 		novo-tabuleiro))
 
+(defun tabuleiro-preenchido-p (tabuleiro linha coluna)
+		(not (equal (aref tabuleiro (maplinha linha) coluna) nil)))
+
+(defun altura-coluna (tabuleiro coluna)
+		(let ((conta-coluna 0))
+			 (loop for nlinha from 0 to 17 
+			 	while (equal (tabuleiro-preenchido-p tabuleiro nlinha coluna) nil) do
+			 		(setf conta-coluna nlinha))
+			 conta-coluna))
+				
+
+
+
+(defun tabuleiro-preenche! (tabuleiro linha coluna)
+	(if (and (numberp linha) (numberp coluna)
+			 (>= linha 0) (<= linha 17)
+			 (>= coluna 0) (<= coluna 9))
+		(setf (aref tabuleiro (maplinha linha) coluna) T)))		
    
 
 
