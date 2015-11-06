@@ -55,9 +55,11 @@
 ; tabuleiro-a-copiar --> array bidimensional que representa o tabuleiro a ser copiado
 (defun copia-tabuleiro (tabuleiro-a-copiar)
 	(let ((novo-tabuleiro (cria-tabuleiro)))
+
 		(loop for linha-actual from 0 to *max-linhas-index* do
       		  (loop for coluna-actual from 0 to *max-colunas-index* do
       		  		(setf (aref novo-tabuleiro linha-actual coluna-actual) (aref tabuleiro-a-copiar linha-actual coluna-actual))))
+
 		novo-tabuleiro))
 
 ; Selectores
@@ -102,8 +104,8 @@
 			 	   	    until (equal (aref tabuleiro linha-actual coluna) T) do
 			 	        	(setf conta-coluna (+ conta-coluna 1)))
 
-			(let ((linha-resultado (maplinha conta-coluna)))
-			 	 	(if (< linha-resultado 0)
+			 (let ((linha-resultado (maplinha conta-coluna)))
+			 	   (if (< linha-resultado 0)
 			 	 		0
 			 	 		linha-resultado))))
 				
@@ -133,7 +135,7 @@
 			 	   	    when (equal (aref tabuleiro linha-a-verificar coluna-actual) T) do
 			 	   	    	(setf conta-colunas-preenchidas (+ conta-colunas-preenchidas 1)))
 
-			 (= conta-colunas-preenchidas *num-colunas*)))
+			  (= conta-colunas-preenchidas *num-colunas*)))
 
 
 
@@ -157,6 +159,25 @@
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 (defun tabuleiro-topo-preenchido-p (tabuleiro)
 	(tabuleiro-linha-completa-p tabuleiro *max-linhas-index*))
+
+
+;Reconhecedor
+; tabuleiros-iguais-p : tabuleiro1 x tabuleiro2 --> T se os tabuleiros tiverem exactamente 
+;												    o mesmo conteudo, nil caso contrario
+; tabuleiro1 --> array bidimensional que representa um tabuleiro
+; tabuleiro2 --> array bidimensional que representa outro tabuleiro
+(defun tabuleiros-iguais-p (tab1 tab2)
+		(let ((tabuleiros-iguais nil))
+
+			 (loop  for linha-actual from 0 to *max-linhas-index* 
+			 	   	    until (equal tabuleiros-iguais T) do
+			 	        	(loop  for coluna-actual from 0 to *max-colunas-index* 
+			 	   	    			until (equal tabuleiros-iguais T) do
+			 	        				(if (not (equal (aref tab1 linha-actual coluna-actual) 
+			 	        						        (aref tab2 linha-actual coluna-actual)))
+			 	        					(setf tabuleiros-iguais T))))
+
+			 (not tabuleiros-iguais)))
 
 
 ; Tabuleiro de exemplo!!!!!
