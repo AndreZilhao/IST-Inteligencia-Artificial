@@ -40,22 +40,19 @@
 
 
 ; TAI - tabuleiro
-; Representacao interna : Uma lista que ira conter todas as linhas do jogo, assim tem 18 posicoes.
-; Cada linha do jogo, ira ser representada igualmente por uma lista. Cada linha (cada elemento da lista anterior) varias listas em que cada uma destas listas ira representar uma linha
-; do jogo do tetris. A posicao vazia e representada por nil
+; Representacao interna : Um array bidimensional que ira conter todas as linhas do jogo, assim tem 18 posicoes.
+; Assim, cada linha do jogo, ira ser representado por um array. A posicao vazia e representada por nil e a ocupada por T
 
 
-; Construtor
+; Construtores
 
-; cria-accao : coluna x configuracao-geometrica-peca 
-; Coluna --> inteiro [0,9] que representa a coluna mais a esquerda para a peca cair 
-; configuracao-geometrica-peca --> Array bidimensional que indica a representacao da peca rodada depois de cair
+; cria-tabuleiro 
+; Retorna um array bidimensional (18 x 10) com todas as posicoes a nil
 (defun cria-tabuleiro ()
 	(make-array (list *num-linhas* *num-colunas*) :initial-element nil))
 
-; cria-accao : coluna x configuracao-geometrica-peca 
-; Coluna --> inteiro [0,9] que representa a coluna mais a esquerda para a peca cair 
-; configuracao-geometrica-peca --> Array bidimensional que indica a representacao da peca rodada depois de cair
+; cria-accao : tabuleiro-a-copiar --> tabuleiro - copia do tabuleiro-a-copiar
+; tabuleiro-a-copiar --> array bidimensional que representa o tabuleiro a ser copiado
 (defun copia-tabuleiro (tabuleiro-a-copiar)
 	(let ((novo-tabuleiro (cria-tabuleiro)))
 		(loop for linha-actual from 0 to *max-linhas-index* do
@@ -63,9 +60,18 @@
       		  		(setf (aref novo-tabuleiro linha-actual coluna-actual) (aref tabuleiro-a-copiar linha-actual coluna-actual))))
 		novo-tabuleiro))
 
+; Selectores
+
+; tabuleiro-preenchido-p : tabuleiro x linha x coluna --> retorna T ou nil consoante a posicao a verificar esteja ou nao ocupada
+; tabuleiro --> array bidimensional que representa um tabuleiro
+; linha --> inteiro [0,17] que representa a linha do tabuleiro
+; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
 		(not (equal (aref tabuleiro (maplinha linha) coluna) nil)))
 
+
+
+; ---------------------- Apenas guardado para ver como se faz debug --------------------
 ;(defun altura-coluna (tabuleiro coluna)
 ;		(let ((conta-coluna 0))
 ;			 (loop  for linha-actual from 0 to *max-linhas-index* 
@@ -74,20 +80,28 @@
 ;			 	    			;(princ (equal (aref tabuleiro linha-actual coluna) nil))
 ;			 	    			(princ "Linha actual")
 ;			 	    			(princ linha-actual)
-			 	    			;(princ conta-coluna)
-			 	    			;(princ " ") 
+;			 	    			;(princ conta-coluna)
+;			 	    			;(princ " ") 
 ;			 	    			(setf conta-coluna (+ conta-coluna 1))
-
+;
 ;			 	    		))
 ;			 (maplinha conta-coluna)))
+; -------------------------------------- END --------------------------------------
+
+
+
 				
-(defun altura-coluna (tabuleiro coluna)
+; tabuleiro altura-coluna : tabuleiro x coluna --> inteiro que representa a linha mais elevada ocupada
+;										 	       da coluna recebida
+; tabuleiro --> array bidimensional que representa um tabuleiro
+; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
+(defun tabuleiro-altura-coluna (tabuleiro coluna)
 		(let ((conta-coluna 0))
 			 
 			 (loop  for linha-actual from 0 to *max-linhas-index* 
 			 	   	    until (equal (aref tabuleiro linha-actual coluna) T) do
 			 	        	(setf conta-coluna (+ conta-coluna 1)))
-			 
+
 			(let ((linha-resultado (maplinha conta-coluna)))
 			 	 	(if (< linha-resultado 0)
 			 	 		0
@@ -95,7 +109,7 @@
 				
 
 
-
+; ----------------- Apenas guardado porque sim ----------------------
 ;(defun altura-coluna (tabuleiro coluna)
 ;		(let ((conta-coluna 0))
 ;			 (progn
@@ -103,19 +117,57 @@
 ;				 	while (equal (tabuleiro-preenchido-p tabuleiro nlinha coluna) nil) do
 ;			 			(setf conta-coluna nlinha)
 ;			 conta-coluna)))
+; ---------------------------- END ---------------------------------
 
+
+
+; Reconhecedor
+; tabuleiro-linha-completa-p : tabuleiro x linha --> T se a linha estiver toda preenchida
+; tabuleiro --> array bidimensional que representa um tabuleiro
+; linha --> inteiro [0,17] que representa a linha do tabuleiro
+(defun tabuleiro-linha-completa-p (tabuleiro linha)
+		(let ((conta-colunas-preenchidas 0)
+			  (linha-a-verificar (maplinha linha)))
+			  
+			  (loop for coluna-actual from 0 to *max-colunas-index* 
+			 	   	    when (equal (aref tabuleiro linha-a-verificar coluna-actual) T) do
+			 	   	    	(setf conta-colunas-preenchidas (+ conta-colunas-preenchidas 1)))
+
+			 (= conta-colunas-preenchidas *num-colunas*)))
+
+
+
+; Modificador
+; tabuleiro-preenche! : tabuleiro x linha x coluna 
+; tabuleiro --> array bidimensional que representa um tabuleiro
+; linha --> inteiro [0,17] que representa a linha do tabuleiro
+; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
+; Altera o tabuleiro recebido. Mete a posicao do tabuleiro indicada pela linha
+; e coluna recebidas a T, ou seja, mete essa posicao como ocupada 
 (defun tabuleiro-preenche! (tabuleiro linha coluna)
 	(if (and (numberp linha) (numberp coluna)
 			 (>= linha 0) (<= linha *max-linhas-index*)
 			 (>= coluna 0) (<= coluna *max-colunas-index*))
-		(setf (aref tabuleiro (maplinha linha) coluna) T)))		
-   
+		(setf (aref tabuleiro (maplinha linha) coluna) T)))	
 
 
-;	loop from
-;	(setf (aref b 7 2) T)
+; Tabuleiro de exemplo!!!!!
+(defun tab-ex ()
+	(let ((a (cria-tabuleiro)))
+		(progn
+			(tabuleiro-preenche! a 1 0)
+			(tabuleiro-preenche! a 1 1)
+			(tabuleiro-preenche! a 1 2)
+			(tabuleiro-preenche! a 1 3)
+			(tabuleiro-preenche! a 1 4)
+			(tabuleiro-preenche! a 1 5)
+			(tabuleiro-preenche! a 1 6)
+			(tabuleiro-preenche! a 1 7)
+			(tabuleiro-preenche! a 1 8)
+			(tabuleiro-preenche! a 1 9)
+			(tabuleiro-preenche! a 3 0)
+			(tabuleiro-preenche! a 3 1)
+			(tabuleiro-preenche! a 4 9)
+			a)))
 
 
-;	(let ((novo-tabuleiro tabuleiro-a-copiar)) 
-;		novo-tabuleiro))
-  
