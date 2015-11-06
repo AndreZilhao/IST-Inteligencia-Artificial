@@ -151,6 +151,14 @@
 		(setf (aref tabuleiro (maplinha linha) coluna) T)))	
 
 
+
+;Reconhecedor
+; tabuleiro-topo-preenchido-p : tabuleiro --> T se a linha do topo estiver toda preenchida
+; tabuleiro --> array bidimensional que representa um tabuleiro
+(defun tabuleiro-topo-preenchido-p (tabuleiro)
+	(tabuleiro-linha-completa-p tabuleiro *max-linhas-index*))
+
+
 ; Tabuleiro de exemplo!!!!!
 (defun tab-ex ()
 	(let ((a (cria-tabuleiro)))
