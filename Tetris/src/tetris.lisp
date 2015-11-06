@@ -181,9 +181,23 @@
 
 ;Transformador de saída
 ; tabuleiro->array : tabuleiro --> Devolve a representacao de um tabuleiro na forma de um array. 
-;								   Por acaso, a nossa representacao interna e tambem um array.
+;								   Por acaso, a nossa representacao interna e tambem um array,
+;								   logo a transformacao e directa.
+;tabuleiro --> tabuleiro a para ser representado como array
 (defun tabuleiro->array (tabuleiro)
 	(copia-tabuleiro (tabuleiro)))
+
+
+;Transformador de entrada
+; array->tabuleiro : array --> Constroi um tabuleiro a partir do input de um array
+;							   Por acaso, a nossa representacao interna e tambem um array,
+;							   logo a transformacao e directa.
+;tabuleiro --> array a partir do qual ira ser criado um novo tabuleiro
+(defun array->tabuleiro (tabuleiro)
+	(copia-tabuleiro (tabuleiro)))
+
+
+
 
 ; Tabuleiro de exemplo!!!!!
 (defun tab-ex ()
