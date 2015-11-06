@@ -1,18 +1,29 @@
 ;(load "utils.lisp")
 
+
+;; Numero de colunas do tabuleiro
+(defparameter *num-colunas* 10)
+;; Numero de linhas do tabuleiro
+(defparameter *num-linhas* 18)
+
+;; Indices maximos das colunas e das linhas do tabuleiro
+(defparameter *max-colunas-index* 9)
+(defparameter *max-linhas-index* 17)
+
+; Funcao auxiliar que mapeia a numeracao das linhas requerida no enunciado em que a linha 0 encontra-se 
+; na posicaoo mais 'abaixo'
+(defun maplinha (linha)
+	(- *max-linhas-index* linha))
+
 ; TAI - accao
+;
 ; Representacao interna : Um par com dois elementos
-
-
 ; Construtor
-
 ; cria-accao : coluna x configuracao-geometrica-peca 
 ; Coluna --> inteiro [0,9] que representa a coluna mais a esquerda para a peca cair 
 ; configuracao-geometrica-peca --> Array bidimensional que indica a representacao da peca rodada depois de cair
 (defun cria-accao (coluna configuracao-geometrica-peca )
 	(cons coluna configuracao-geometrica-peca))
-
-
 
 ; Selectores
 
@@ -28,15 +39,10 @@
 
 
 
-(defun maplinha (linha)
-	(- 17 linha))
-
-
 ; TAI - tabuleiro
 ; Representacao interna : Uma lista que ira conter todas as linhas do jogo, assim tem 18 posicoes.
 ; Cada linha do jogo, ira ser representada igualmente por uma lista. Cada linha (cada elemento da lista anterior) varias listas em que cada uma destas listas ira representar uma linha
-; do jogo do tetris. 
-;, a posicao vazia e representada por uma string vazia : ""
+; do jogo do tetris. A posicao vazia e representada por nil
 
 
 ; Construtor
@@ -45,32 +51,63 @@
 ; Coluna --> inteiro [0,9] que representa a coluna mais a esquerda para a peca cair 
 ; configuracao-geometrica-peca --> Array bidimensional que indica a representacao da peca rodada depois de cair
 (defun cria-tabuleiro ()
-	(make-array (list 18 10) :initial-element nil))
+	(make-array (list *num-linhas* *num-colunas*) :initial-element nil))
 
+; cria-accao : coluna x configuracao-geometrica-peca 
+; Coluna --> inteiro [0,9] que representa a coluna mais a esquerda para a peca cair 
+; configuracao-geometrica-peca --> Array bidimensional que indica a representacao da peca rodada depois de cair
 (defun copia-tabuleiro (tabuleiro-a-copiar)
 	(let ((novo-tabuleiro (cria-tabuleiro)))
-		(loop for nlinha from 0 to 17 do
-      		  (loop for ncoluna from 0 to 9 do
-      		  		(setf (aref novo-tabuleiro nlinha ncoluna) (aref tabuleiro-a-copiar nlinha ncoluna))))
+		(loop for linha-actual from 0 to *max-linhas-index* do
+      		  (loop for coluna-actual from 0 to *max-colunas-index* do
+      		  		(setf (aref novo-tabuleiro linha-actual coluna-actual) (aref tabuleiro-a-copiar linha-actual coluna-actual))))
 		novo-tabuleiro))
 
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
 		(not (equal (aref tabuleiro (maplinha linha) coluna) nil)))
 
+;(defun altura-coluna (tabuleiro coluna)
+;		(let ((conta-coluna 0))
+;			 (loop  for linha-actual from 0 to *max-linhas-index* 
+;			 			until (equal (aref tabuleiro linha-actual coluna) T) do ; until (> linha-actual 10) do 
+;			 	    		(progn 
+;			 	    			;(princ (equal (aref tabuleiro linha-actual coluna) nil))
+;			 	    			(princ "Linha actual")
+;			 	    			(princ linha-actual)
+			 	    			;(princ conta-coluna)
+			 	    			;(princ " ") 
+;			 	    			(setf conta-coluna (+ conta-coluna 1))
+
+;			 	    		))
+;			 (maplinha conta-coluna)))
+				
 (defun altura-coluna (tabuleiro coluna)
 		(let ((conta-coluna 0))
-			 (loop for nlinha from 0 to 17 
-			 	while (equal (tabuleiro-preenchido-p tabuleiro nlinha coluna) nil) do
-			 		(setf conta-coluna nlinha))
-			 conta-coluna))
+			 
+			 (loop  for linha-actual from 0 to *max-linhas-index* 
+			 	   	    until (equal (aref tabuleiro linha-actual coluna) T) do
+			 	        	(setf conta-coluna (+ conta-coluna 1)))
+			 
+			(let ((linha-resultado (maplinha conta-coluna)))
+			 	 	(if (< linha-resultado 0)
+			 	 		0
+			 	 		linha-resultado))))
 				
 
 
 
+;(defun altura-coluna (tabuleiro coluna)
+;		(let ((conta-coluna 0))
+;			 (progn
+;			 	(dotimes *max-linhas-index*) 
+;				 	while (equal (tabuleiro-preenchido-p tabuleiro nlinha coluna) nil) do
+;			 			(setf conta-coluna nlinha)
+;			 conta-coluna)))
+
 (defun tabuleiro-preenche! (tabuleiro linha coluna)
 	(if (and (numberp linha) (numberp coluna)
-			 (>= linha 0) (<= linha 17)
-			 (>= coluna 0) (<= coluna 9))
+			 (>= linha 0) (<= linha *max-linhas-index*)
+			 (>= coluna 0) (<= coluna *max-colunas-index*))
 		(setf (aref tabuleiro (maplinha linha) coluna) T)))		
    
 
