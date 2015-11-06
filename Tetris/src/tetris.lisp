@@ -153,6 +153,20 @@
 		(setf (aref tabuleiro (maplinha linha) coluna) T)))	
 
 
+; Modificador
+(defun tabuleiros-remove-linha! (tabuleiro linha)
+		(let ((tabuleiros-iguais nil)
+			  (linha-mapeada (maplinha linha)))
+			 	(loop  for linha-actual from linha-mapeada downto 0 do
+			 		 (progn
+			 		 	(princ linha-actual) 
+			 		 	(if (= linha-actual 0)
+			 		 	 (loop  for coluna-actual from 0 to *max-colunas-index*  do
+			 	        			(setf (aref tabuleiro linha-actual coluna-actual) nil))
+			 	 		 (let ((linha-anterior (1- linha-actual)))
+			 	        	   (loop  for coluna-actual from 0 to *max-colunas-index*  do
+			 	        				  (setf (aref tabuleiro linha-actual coluna-actual)
+			 	        						 (aref tabuleiro linha-anterior coluna-actual)))))))))
 
 ;Reconhecedor
 ; tabuleiro-topo-preenchido-p : tabuleiro --> T se a linha do topo estiver toda preenchida
@@ -213,6 +227,16 @@
 			(tabuleiro-preenche! a 1 7)
 			(tabuleiro-preenche! a 1 8)
 			(tabuleiro-preenche! a 1 9)
+			(tabuleiro-preenche! a 17 0)
+			(tabuleiro-preenche! a 17 1)
+			(tabuleiro-preenche! a 17 2)
+			(tabuleiro-preenche! a 17 3)
+			(tabuleiro-preenche! a 17 4)
+			(tabuleiro-preenche! a 17 5)
+			(tabuleiro-preenche! a 17 6)
+			(tabuleiro-preenche! a 17 7)
+			(tabuleiro-preenche! a 17 8)
+			(tabuleiro-preenche! a 17 9)
 			(tabuleiro-preenche! a 3 0)
 			(tabuleiro-preenche! a 3 1)
 			(tabuleiro-preenche! a 4 9)
