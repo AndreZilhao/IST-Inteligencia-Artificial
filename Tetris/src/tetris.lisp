@@ -179,6 +179,11 @@
 
 			 (not tabuleiros-iguais)))
 
+;Transformador de saída
+; tabuleiro->array : tabuleiro --> Devolve a representacao de um tabuleiro na forma de um array. 
+;								   Por acaso, a nossa representacao interna e tambem um array.
+(defun tabuleiro->array (tabuleiro)
+	(copia-tabuleiro (tabuleiro)))
 
 ; Tabuleiro de exemplo!!!!!
 (defun tab-ex ()
