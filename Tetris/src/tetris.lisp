@@ -1,4 +1,4 @@
-;(load "utils.lisp")
+(load "utils.lisp")
 
 
 ;; Numero de colunas do tabuleiro
@@ -62,8 +62,8 @@
 
 		novo-tabuleiro))
 
-; Selectores
 
+; Selectores
 ; tabuleiro-preenchido-p : tabuleiro x linha x coluna --> retorna T ou nil consoante a posicao a verificar esteja ou nao ocupada
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro
@@ -154,19 +154,24 @@
 
 
 ; Modificador
+; tabuleiros-remove-linha!: tabuleiro x linha
+; tabuleiro --> array bidimensional que representa um tabuleiro
+; linha --> inteiro [0,17] que representa a linha do tabuleiro
+; Altera o tabuleiro recebido. Remove a linha numero passada no 
+; argunmento linha. Desce as restantes linha uma posicao e acrecenta
+; uma nova linha no topo com todas as posicoes vazias
 (defun tabuleiros-remove-linha! (tabuleiro linha)
 		(let ((tabuleiros-iguais nil)
 			  (linha-mapeada (maplinha linha)))
+			 	
 			 	(loop  for linha-actual from linha-mapeada downto 0 do
-			 		 (progn
-			 		 	(princ linha-actual) 
 			 		 	(if (= linha-actual 0)
-			 		 	 (loop  for coluna-actual from 0 to *max-colunas-index*  do
+			 		 	 	(loop  for coluna-actual from 0 to *max-colunas-index*  do
 			 	        			(setf (aref tabuleiro linha-actual coluna-actual) nil))
-			 	 		 (let ((linha-anterior (1- linha-actual)))
-			 	        	   (loop  for coluna-actual from 0 to *max-colunas-index*  do
+			 	 		 	(let ((linha-anterior (1- linha-actual)))
+			 	        		    (loop  for coluna-actual from 0 to *max-colunas-index*  do
 			 	        				  (setf (aref tabuleiro linha-actual coluna-actual)
-			 	        						 (aref tabuleiro linha-anterior coluna-actual)))))))))
+			 	        						(aref tabuleiro linha-anterior coluna-actual))))))))
 
 ;Reconhecedor
 ; tabuleiro-topo-preenchido-p : tabuleiro --> T se a linha do topo estiver toda preenchida
@@ -212,6 +217,13 @@
 
 
 
+; TAI Estado
+(defstruct estado pontos pecas-por-colocar pecas-colocadas tabuleiro)
+
+(defun copia-estado (estado-a-copiar)
+	(make-estado :pontos (estado-a-copiar-pontos)))
+
+
 
 ; Tabuleiro de exemplo!!!!!
 (defun tab-ex ()
@@ -241,5 +253,8 @@
 			(tabuleiro-preenche! a 3 1)
 			(tabuleiro-preenche! a 4 9)
 			a)))
+
+(defun estado-exemplo ()
+		(make-estado :pontos 4 :pecas-por-colocar '()))
 
 
