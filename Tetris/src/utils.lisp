@@ -98,21 +98,15 @@
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
-		(let ((conta-coluna 0))
-			 (progn
-			 (loop for linha-actual from *max-linhas-index* downto 0 
-			 	   	    until (progn (incf conta-coluna)
-			 	   	    			 (equal (aref tabuleiro linha-actual coluna) T))); do
-			 	        			;(progn (princ " bla ")
-			 	   					;(princ linha-actual)
-			 	        			;(princ " | ")))
-			  ;(princ " Final ")
-			  conta-coluna)))	
-			  ;(princ linha-actual)
-			 ;(let ((linha-resultado (maplinha conta-coluna)))
-			 ;	   (if (< linha-resultado 0)
-			 ;	 		0
-			 ;	 		linha-resultado)))))
+		(let ((conta-coluna *num-linhas*)
+			  (coluna-toda-preenchida T))
+			 	(loop for linha-actual from 0 to *max-linhas-index* 
+			 	   	  until (equal (aref tabuleiro linha-actual coluna) T) 
+			 				 do
+			 				 	(decf conta-coluna))
+			 				  	;(setf coluna-toda-preenchida nil))
+			  conta-coluna))	
+
 				
 
 
