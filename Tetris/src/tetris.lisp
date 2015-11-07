@@ -1,6 +1,8 @@
 (load "utils.lisp")
 
 
+(+ 3 4)
+
 ;; Numero de colunas do tabuleiro
 (defparameter *num-colunas* 10)
 ;; Numero de linhas do tabuleiro

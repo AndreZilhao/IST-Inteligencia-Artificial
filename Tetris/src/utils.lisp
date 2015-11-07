@@ -99,15 +99,20 @@
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
 		(let ((conta-coluna 0))
-			 
-			 (loop  for linha-actual from 0 to *max-linhas-index* 
-			 	   	    until (equal (aref tabuleiro linha-actual coluna) T) do
-			 	        	(setf conta-coluna (+ conta-coluna 1)))
-
-			 (let ((linha-resultado (maplinha conta-coluna)))
-			 	   (if (< linha-resultado 0)
-			 	 		0
-			 	 		linha-resultado))))
+			 (progn
+			 (loop for linha-actual from *max-linhas-index* downto 0 
+			 	   	    until (progn (incf conta-coluna)
+			 	   	    			 (equal (aref tabuleiro linha-actual coluna) T))); do
+			 	        			;(progn (princ " bla ")
+			 	   					;(princ linha-actual)
+			 	        			;(princ " | ")))
+			  ;(princ " Final ")
+			  conta-coluna)))	
+			  ;(princ linha-actual)
+			 ;(let ((linha-resultado (maplinha conta-coluna)))
+			 ;	   (if (< linha-resultado 0)
+			 ;	 		0
+			 ;	 		linha-resultado)))))
 				
 
 
@@ -173,11 +178,26 @@
 			 	        				  (setf (aref tabuleiro linha-actual coluna-actual)
 			 	        						(aref tabuleiro linha-anterior coluna-actual))))))))
 
+
 ;Reconhecedor
-; tabuleiro-topo-preenchido-p : tabuleiro --> T se a linha do topo estiver toda preenchida
+; tabuleiro-topo-preenchido-p : tabuleiro x linha --> T se a linha indicada tiver algum valor preenchido
+; tabuleiro --> array bidimensional que representa um tabuleiro
+; linha --> inteiro [0,17] que representa a linha do tabuleiro a ser verificada
+(defun verifica-linha-preenchida-p (tab linha)
+	(let ((valor-posicao-actual nil))
+	  	  (loop for coluna-actual from 0 to *max-colunas-index* 
+  			  	until (equal valor-posicao-actual T) do
+	 	        	(if (equal (aref tab linha coluna-actual) T) 
+	 	        		(setf valor-posicao-actual T)))
+	   	  valor-posicao-actual))
+
+;Reconhecedor
+; tabuleiro-topo-preenchido-p : tabuleiro --> T se a linha do topo tiver algum valor preenchido
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 (defun tabuleiro-topo-preenchido-p (tabuleiro)
-	(tabuleiro-linha-completa-p tabuleiro *max-linhas-index*))
+	(verifica-linha-preenchida-p tabuleiro (maplinha *max-linhas-index*)))
+
+
 
 
 ;Reconhecedor
