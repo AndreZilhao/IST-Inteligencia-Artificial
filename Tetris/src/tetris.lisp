@@ -46,7 +46,7 @@
 ; cria-tabuleiro 
 ; Retorna um array bidimensional (18 x 10) com todas as posicoes a nil
 (defun cria-tabuleiro ()
-	(make-array (list NUM-LINHAS NUM-COLUNAS) :initial-element nil))
+	(make-array (list NUM-LINHAS NUM-COLUNAS) :initial-element 'F))
 
 ; cria-accao : tabuleiro-a-copiar --> tabuleiro - copia do tabuleiro-a-copiar
 ; tabuleiro-a-copiar --> array bidimensional que representa o tabuleiro a ser copiado
@@ -66,7 +66,7 @@
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
-		(not (equal (aref tabuleiro (maplinha linha) coluna) nil)))
+		(not (equal (aref tabuleiro (maplinha linha) coluna) 'F)))
 
 
 
@@ -344,3 +344,4 @@
 (defun estado-exemplo3 ()
 		(make-estado :pontos 3 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))
 
+(load "utils.fas")
