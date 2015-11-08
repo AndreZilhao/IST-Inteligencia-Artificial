@@ -1,3 +1,4 @@
+;(load "utils.fas")
 ;; Numero de colunas do tabuleiro
 (defparameter NUM-COLUNAS 10)
 ;; Numero de linhas do tabuleiro
@@ -54,8 +55,8 @@
 	(let ((novo-tabuleiro (cria-tabuleiro)))
 
 		(loop for linha-actual from 0 to MAX-LINHAS-INDEX do
-      		  (loop for coluna-actual from 0 to MAX-COLUNAS-INDEX do
-      		  		(setf (aref novo-tabuleiro linha-actual coluna-actual) (aref tabuleiro-a-copiar linha-actual coluna-actual))))
+			(loop for coluna-actual from 0 to MAX-COLUNAS-INDEX do
+				(setf (aref novo-tabuleiro linha-actual coluna-actual) (aref tabuleiro-a-copiar linha-actual coluna-actual))))
 
 		novo-tabuleiro))
 
@@ -66,7 +67,7 @@
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
-		(not (equal (aref tabuleiro (maplinha linha) coluna) 'F)))
+	(not (equal (aref tabuleiro (maplinha linha) coluna) 'F)))
 
 
 
@@ -89,21 +90,21 @@
 
 
 
-				
+
 ; tabuleiro altura-coluna : tabuleiro x coluna --> inteiro que representa a linha mais elevada ocupada
 ;										 	       da coluna recebida
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
-		(let ((conta-coluna NUM-LINHAS))
-			 	(loop for linha-actual from 0 to MAX-LINHAS-INDEX 
-			 	   	  until (equal (aref tabuleiro linha-actual coluna) T) 
-			 				 do
-			 				 	(decf conta-coluna))
+	(let ((conta-coluna NUM-LINHAS))
+		(loop for linha-actual from 0 to MAX-LINHAS-INDEX 
+			until (equal (aref tabuleiro linha-actual coluna) T) 
+			do
+			(decf conta-coluna))
 			 				  	;(setf coluna-toda-preenchida nil))
-			  conta-coluna))	
+	conta-coluna))	
 
-				
+
 
 
 ; ----------------- Apenas guardado porque sim ----------------------
@@ -123,14 +124,14 @@
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro
 (defun tabuleiro-linha-completa-p (tabuleiro linha)
-		(let ((conta-colunas-preenchidas 0)
-			  (linha-a-verificar (maplinha linha)))
-			  
-			  (loop for coluna-actual from 0 to MAX-COLUNAS-INDEX 
-			 	   	    when (equal (aref tabuleiro linha-a-verificar coluna-actual) T) do
-			 	   	    	(setf conta-colunas-preenchidas (+ conta-colunas-preenchidas 1)))
+	(let ((conta-colunas-preenchidas 0)
+		(linha-a-verificar (maplinha linha)))
 
-			  (= conta-colunas-preenchidas NUM-COLUNAS)))
+	(loop for coluna-actual from 0 to MAX-COLUNAS-INDEX 
+		when (equal (aref tabuleiro linha-a-verificar coluna-actual) T) do
+		(setf conta-colunas-preenchidas (+ conta-colunas-preenchidas 1)))
+
+	(= conta-colunas-preenchidas NUM-COLUNAS)))
 
 
 
@@ -143,9 +144,9 @@
 ; e coluna recebidas a T, ou seja, mete essa posicao como ocupada 
 (defun tabuleiro-preenche! (tabuleiro linha coluna)
 	(if (and (numberp linha) (numberp coluna)
-			 (>= linha 0) (<= linha MAX-LINHAS-INDEX)
-			 (>= coluna 0) (<= coluna MAX-COLUNAS-INDEX))
-		(setf (aref tabuleiro (maplinha linha) coluna) T)))	
+		(>= linha 0) (<= linha MAX-LINHAS-INDEX)
+		(>= coluna 0) (<= coluna MAX-COLUNAS-INDEX))
+	(setf (aref tabuleiro (maplinha linha) coluna) T)))	
 
 
 ; Modificador
@@ -156,16 +157,16 @@
 ; argunmento linha. Desce as restantes linha uma posicao e acrecenta
 ; uma nova linha no topo com todas as posicoes vazias
 (defun tabuleiro-remove-linha! (tabuleiro linha)
-		(let ((linha-mapeada (maplinha linha)))
-			 	
-			 	(loop  for linha-actual from linha-mapeada downto 0 do
-			 		 	(if (= linha-actual 0)
-			 		 	 	(loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX  do
-			 	        			(setf (aref tabuleiro linha-actual coluna-actual) nil))
-			 	 		 	(let ((linha-anterior (1- linha-actual)))
-			 	        		    (loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX  do
-			 	        				  (setf (aref tabuleiro linha-actual coluna-actual)
-			 	        						(aref tabuleiro linha-anterior coluna-actual))))))))
+	(let ((linha-mapeada (maplinha linha)))
+
+		(loop  for linha-actual from linha-mapeada downto 0 do
+			(if (= linha-actual 0)
+				(loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX  do
+					(setf (aref tabuleiro linha-actual coluna-actual) nil))
+				(let ((linha-anterior (1- linha-actual)))
+					(loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX  do
+						(setf (aref tabuleiro linha-actual coluna-actual)
+							(aref tabuleiro linha-anterior coluna-actual))))))))
 
 
 ;Reconhecedor
@@ -174,11 +175,11 @@
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro a ser verificada
 (defun verifica-linha-preenchida-p (tab linha)
 	(let ((valor-posicao-actual nil))
-	  	  (loop for coluna-actual from 0 to MAX-COLUNAS-INDEX 
-  			  	until (equal valor-posicao-actual T) do
-	 	        	(if (equal (aref tab linha coluna-actual) T) 
-	 	        		(setf valor-posicao-actual T)))
-	   	  valor-posicao-actual))
+		(loop for coluna-actual from 0 to MAX-COLUNAS-INDEX 
+			until (equal valor-posicao-actual T) do
+			(if (equal (aref tab linha coluna-actual) T) 
+				(setf valor-posicao-actual T)))
+		valor-posicao-actual))
 
 ;Reconhecedor
 ; tabuleiro-topo-preenchido-p : tabuleiro --> T se a linha do topo tiver algum valor preenchido
@@ -195,17 +196,17 @@
 ; tabuleiro1 --> array bidimensional que representa um tabuleiro
 ; tabuleiro2 --> array bidimensional que representa outro tabuleiro
 (defun tabuleiros-iguais-p (tab1 tab2)
-		(let ((tabuleiros-iguais nil))
+	(let ((tabuleiros-iguais nil))
 
-			 (loop  for linha-actual from 0 to MAX-LINHAS-INDEX 
-			 	   	    until (equal tabuleiros-iguais T) do
-			 	        	(loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX 
-			 	   	    			until (equal tabuleiros-iguais T) do
-			 	        				(if (not (equal (aref tab1 linha-actual coluna-actual) 
-			 	        						        (aref tab2 linha-actual coluna-actual)))
-			 	        					(setf tabuleiros-iguais T))))
+		(loop  for linha-actual from 0 to MAX-LINHAS-INDEX 
+			until (equal tabuleiros-iguais T) do
+			(loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX 
+				until (equal tabuleiros-iguais T) do
+				(if (not (equal (aref tab1 linha-actual coluna-actual) 
+					(aref tab2 linha-actual coluna-actual)))
+				(setf tabuleiros-iguais T))))
 
-			 (not tabuleiros-iguais)))
+		(not tabuleiros-iguais)))
 
 ;Transformador de saida
 ; tabuleiro->array : tabuleiro --> Devolve a representacao de um tabuleiro na forma de um array. 
@@ -239,20 +240,20 @@
 ; do recebido por input
 (defun copia-estado (estado-a-copiar)
 	(make-estado :pontos (estado-pontos estado-a-copiar) 
-				 :pecas-por-colocar (copy-list (estado-pecas-por-colocar estado-a-copiar))
-				 :pecas-colocadas (copy-list (estado-pecas-colocadas estado-a-copiar))
-				 :tabuleiro (copia-tabuleiro (estado-tabuleiro estado-a-copiar))))
+		:pecas-por-colocar (copy-list (estado-pecas-por-colocar estado-a-copiar))
+		:pecas-colocadas (copy-list (estado-pecas-colocadas estado-a-copiar))
+		:tabuleiro (copia-tabuleiro (estado-tabuleiro estado-a-copiar))))
 
 ; Verifica se dois estados sao iguais.
 (defun estados-iguais-p (estado1 estado2)
 	(and (= (estado-pontos estado1) 
-		    (estado-pontos estado2))
-		 (equal (estado-pecas-por-colocar estado1) 
-		 		(estado-pecas-por-colocar estado2))
-		 (equal (estado-pecas-colocadas estado1) 
-		 		(estado-pecas-colocadas estado2))
-		 (tabuleiros-iguais-p (estado-tabuleiro estado1) 
-		 					  (estado-tabuleiro estado2))))
+		(estado-pontos estado2))
+	(equal (estado-pecas-por-colocar estado1) 
+		(estado-pecas-por-colocar estado2))
+	(equal (estado-pecas-colocadas estado1) 
+		(estado-pecas-colocadas estado2))
+	(tabuleiros-iguais-p (estado-tabuleiro estado1) 
+		(estado-tabuleiro estado2))))
 
 ; Verifica se um estado e final
 (defun estado-final-p (estado-a-verificar)
@@ -272,6 +273,50 @@
 (defstruct problema estado-inicial solucao accoes resultado custo-caminho)
 
 
+;
+;
+;
+;verifica se um estado e solucao
+(defun solucao (estado-a-verificar)
+	(and (not (tabuleiro-topo-preenchido-p (estado-tabuleiro estado-a-verificar)))
+		(equal (estado-pecas-por-colocar estado-a-verificar) '() )))
+
+
+
+(defun preenche-lista-accoes (lista-accoes lista-configuracoes) 
+	(let ((coluna NUM-COLUNAS)
+		(tamanho-lista-configuracoes (length lista-configuracoes)))
+	(progn 
+		(loop for a from 1 to tamanho-lista-configuracoes do
+			(progn
+				(setf coluna (- NUM-COLUNAS (array-dimension (car lista-configuracoes) 1)))
+				(loop for i from 0 to coluna do
+					(setf lista-accoes (append lista-accoes (list (cria-accao i (car lista-configuracoes)))))
+					)
+				(setf lista-configuracoes (cdr lista-configuracoes))))
+
+		lista-accoes)))
+
+(defun accoes (estado)
+	(let ((peca (first (estado-pecas-por-colocar estado)))
+		(lista-accoes '()))
+	(case peca 
+		(i (preenche-lista-accoes lista-accoes (list peca-i0 peca-i1)))
+		(l (preenche-lista-accoes lista-accoes (list peca-l0 peca-l1 peca-l2 peca-l3)))
+		(j (preenche-lista-accoes lista-accoes (list peca-j0 peca-j1 peca-j2 peca-j3)))
+		(o (preenche-lista-accoes lista-accoes (list peca-o0)))
+		(s (preenche-lista-accoes lista-accoes (list peca-s0 peca-s1)))
+		(z (preenche-lista-accoes lista-accoes (list peca-z0 peca-z1)))
+		(t (preenche-lista-accoes lista-accoes (list peca-t0 peca-t1 peca-t2 peca-t3)))))
+	)
+
+(defun qualidade (estado)
+  (- 0 (estado-pontos estado)))
+
+;(defun custo-oportunidade (estado)
+;  (let ((pontos ())
+;		(lista-accoes '()))
+;  ))
 
 
 ; Tabuleiro de exemplo!!!!!
@@ -331,17 +376,16 @@
 			(tabuleiro-preenche! a 3 0)
 			(tabuleiro-preenche! a 3 1)
 			(tabuleiro-preenche! a 4 9)
-
 			a)))
 
 ;--
 (defun estado-exemplo1 ()
-		(make-estado :pontos 4 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))
+	(make-estado :pontos 4 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))
 
 (defun estado-exemplo2 ()
-		(make-estado :pontos 19 :pecas-por-colocar '(l) :pecas-colocadas '(i o t) :tabuleiro (tab-ex2)))
+	(make-estado :pontos 19 :pecas-por-colocar '(l) :pecas-colocadas '(i o t) :tabuleiro (tab-ex2)))
 
 (defun estado-exemplo3 ()
-		(make-estado :pontos 3 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))
+	(make-estado :pontos 3 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))
 
-(load "utils.fas")
+
