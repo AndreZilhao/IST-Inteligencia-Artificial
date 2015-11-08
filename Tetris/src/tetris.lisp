@@ -1,16 +1,16 @@
 ;; Numero de colunas do tabuleiro
-(defparameter *num-colunas* 10)
+(defparameter NUM-COLUNAS 10)
 ;; Numero de linhas do tabuleiro
-(defparameter *num-linhas* 18)
+(defparameter NUM-LINHAS 18)
 
 ;; Indices maximos das colunas e das linhas do tabuleiro
-(defparameter *max-colunas-index* 9)
-(defparameter *max-linhas-index* 17)
+(defparameter MAX-COLUNAS-INDEX 9)
+(defparameter MAX-LINHAS-INDEX 17)
 
 ; Funcao auxiliar que mapeia a numeracao das linhas requerida no enunciado em que a linha 0 encontra-se 
 ; na posicaoo mais 'abaixo'
 (defun maplinha (linha)
-	(- *max-linhas-index* linha))
+	(- MAX-LINHAS-INDEX linha))
 
 ; TAI - accao
 ;
@@ -46,15 +46,15 @@
 ; cria-tabuleiro 
 ; Retorna um array bidimensional (18 x 10) com todas as posicoes a nil
 (defun cria-tabuleiro ()
-	(make-array (list *num-linhas* *num-colunas*) :initial-element nil))
+	(make-array (list NUM-LINHAS NUM-COLUNAS) :initial-element nil))
 
 ; cria-accao : tabuleiro-a-copiar --> tabuleiro - copia do tabuleiro-a-copiar
 ; tabuleiro-a-copiar --> array bidimensional que representa o tabuleiro a ser copiado
 (defun copia-tabuleiro (tabuleiro-a-copiar)
 	(let ((novo-tabuleiro (cria-tabuleiro)))
 
-		(loop for linha-actual from 0 to *max-linhas-index* do
-      		  (loop for coluna-actual from 0 to *max-colunas-index* do
+		(loop for linha-actual from 0 to MAX-LINHAS-INDEX do
+      		  (loop for coluna-actual from 0 to MAX-COLUNAS-INDEX do
       		  		(setf (aref novo-tabuleiro linha-actual coluna-actual) (aref tabuleiro-a-copiar linha-actual coluna-actual))))
 
 		novo-tabuleiro))
@@ -73,7 +73,7 @@
 ; ---------------------- Apenas guardado para ver como se faz debug --------------------
 ;(defun altura-coluna (tabuleiro coluna)
 ;		(let ((conta-coluna 0))
-;			 (loop  for linha-actual from 0 to *max-linhas-index* 
+;			 (loop  for linha-actual from 0 to MAX-LINHAS-INDEX 
 ;			 			until (equal (aref tabuleiro linha-actual coluna) T) do ; until (> linha-actual 10) do 
 ;			 	    		(progn 
 ;			 	    			;(princ (equal (aref tabuleiro linha-actual coluna) nil))
@@ -95,8 +95,8 @@
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
-		(let ((conta-coluna *num-linhas*))
-			 	(loop for linha-actual from 0 to *max-linhas-index* 
+		(let ((conta-coluna NUM-LINHAS))
+			 	(loop for linha-actual from 0 to MAX-LINHAS-INDEX 
 			 	   	  until (equal (aref tabuleiro linha-actual coluna) T) 
 			 				 do
 			 				 	(decf conta-coluna))
@@ -110,7 +110,7 @@
 ;(defun altura-coluna (tabuleiro coluna)
 ;		(let ((conta-coluna 0))
 ;			 (progn
-;			 	(dotimes *max-linhas-index*) 
+;			 	(dotimes MAX-LINHAS-INDEX) 
 ;				 	while (equal (tabuleiro-preenchido-p tabuleiro nlinha coluna) nil) do
 ;			 			(setf conta-coluna nlinha)
 ;			 conta-coluna)))
@@ -126,11 +126,11 @@
 		(let ((conta-colunas-preenchidas 0)
 			  (linha-a-verificar (maplinha linha)))
 			  
-			  (loop for coluna-actual from 0 to *max-colunas-index* 
+			  (loop for coluna-actual from 0 to MAX-COLUNAS-INDEX 
 			 	   	    when (equal (aref tabuleiro linha-a-verificar coluna-actual) T) do
 			 	   	    	(setf conta-colunas-preenchidas (+ conta-colunas-preenchidas 1)))
 
-			  (= conta-colunas-preenchidas *num-colunas*)))
+			  (= conta-colunas-preenchidas NUM-COLUNAS)))
 
 
 
@@ -143,8 +143,8 @@
 ; e coluna recebidas a T, ou seja, mete essa posicao como ocupada 
 (defun tabuleiro-preenche! (tabuleiro linha coluna)
 	(if (and (numberp linha) (numberp coluna)
-			 (>= linha 0) (<= linha *max-linhas-index*)
-			 (>= coluna 0) (<= coluna *max-colunas-index*))
+			 (>= linha 0) (<= linha MAX-LINHAS-INDEX)
+			 (>= coluna 0) (<= coluna MAX-COLUNAS-INDEX))
 		(setf (aref tabuleiro (maplinha linha) coluna) T)))	
 
 
@@ -160,10 +160,10 @@
 			 	
 			 	(loop  for linha-actual from linha-mapeada downto 0 do
 			 		 	(if (= linha-actual 0)
-			 		 	 	(loop  for coluna-actual from 0 to *max-colunas-index*  do
+			 		 	 	(loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX  do
 			 	        			(setf (aref tabuleiro linha-actual coluna-actual) nil))
 			 	 		 	(let ((linha-anterior (1- linha-actual)))
-			 	        		    (loop  for coluna-actual from 0 to *max-colunas-index*  do
+			 	        		    (loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX  do
 			 	        				  (setf (aref tabuleiro linha-actual coluna-actual)
 			 	        						(aref tabuleiro linha-anterior coluna-actual))))))))
 
@@ -174,7 +174,7 @@
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro a ser verificada
 (defun verifica-linha-preenchida-p (tab linha)
 	(let ((valor-posicao-actual nil))
-	  	  (loop for coluna-actual from 0 to *max-colunas-index* 
+	  	  (loop for coluna-actual from 0 to MAX-COLUNAS-INDEX 
   			  	until (equal valor-posicao-actual T) do
 	 	        	(if (equal (aref tab linha coluna-actual) T) 
 	 	        		(setf valor-posicao-actual T)))
@@ -184,7 +184,7 @@
 ; tabuleiro-topo-preenchido-p : tabuleiro --> T se a linha do topo tiver algum valor preenchido
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 (defun tabuleiro-topo-preenchido-p (tabuleiro)
-	(verifica-linha-preenchida-p tabuleiro (maplinha *max-linhas-index*)))
+	(verifica-linha-preenchida-p tabuleiro (maplinha MAX-LINHAS-INDEX)))
 
 
 
@@ -197,9 +197,9 @@
 (defun tabuleiros-iguais-p (tab1 tab2)
 		(let ((tabuleiros-iguais nil))
 
-			 (loop  for linha-actual from 0 to *max-linhas-index* 
+			 (loop  for linha-actual from 0 to MAX-LINHAS-INDEX 
 			 	   	    until (equal tabuleiros-iguais T) do
-			 	        	(loop  for coluna-actual from 0 to *max-colunas-index* 
+			 	        	(loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX 
 			 	   	    			until (equal tabuleiros-iguais T) do
 			 	        				(if (not (equal (aref tab1 linha-actual coluna-actual) 
 			 	        						        (aref tab2 linha-actual coluna-actual)))
