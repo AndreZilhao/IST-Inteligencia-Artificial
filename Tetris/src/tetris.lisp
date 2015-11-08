@@ -95,8 +95,7 @@
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
-		(let ((conta-coluna *num-linhas*)
-			  (coluna-toda-preenchida T))
+		(let ((conta-coluna *num-linhas*))
 			 	(loop for linha-actual from 0 to *max-linhas-index* 
 			 	   	  until (equal (aref tabuleiro linha-actual coluna) T) 
 			 				 do
@@ -157,8 +156,7 @@
 ; argunmento linha. Desce as restantes linha uma posicao e acrecenta
 ; uma nova linha no topo com todas as posicoes vazias
 (defun tabuleiro-remove-linha! (tabuleiro linha)
-		(let ((tabuleiros-iguais nil)
-			  (linha-mapeada (maplinha linha)))
+		(let ((linha-mapeada (maplinha linha)))
 			 	
 			 	(loop  for linha-actual from linha-mapeada downto 0 do
 			 		 	(if (= linha-actual 0)
@@ -209,13 +207,13 @@
 
 			 (not tabuleiros-iguais)))
 
-;Transformador de saída
+;Transformador de saida
 ; tabuleiro->array : tabuleiro --> Devolve a representacao de um tabuleiro na forma de um array. 
 ;								   Por acaso, a nossa representacao interna e tambem um array,
 ;								   logo a transformacao e directa.
 ;tabuleiro --> tabuleiro a para ser representado como array
 (defun tabuleiro->array (tabuleiro)
-	(copia-tabuleiro (tabuleiro)))
+	(copia-tabuleiro tabuleiro))
 
 
 ;Transformador de entrada
@@ -224,7 +222,7 @@
 ;							   logo a transformacao e directa.
 ;tabuleiro --> array a partir do qual ira ser criado um novo tabuleiro
 (defun array->tabuleiro (tabuleiro)
-	(copia-tabuleiro (tabuleiro)))
+	(copia-tabuleiro tabuleiro))
 
 
 
@@ -336,6 +334,7 @@
 
 			a)))
 
+;--
 (defun estado-exemplo1 ()
 		(make-estado :pontos 4 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))
 
@@ -344,3 +343,4 @@
 
 (defun estado-exemplo3 ()
 		(make-estado :pontos 3 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))
+
