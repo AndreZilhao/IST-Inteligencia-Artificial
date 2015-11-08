@@ -1,0 +1,53 @@
+#!/bin/bash
+# My first script
+echo '(load "utilsaux.lisp")' > utl
+cat  tetris.lisp utl  ../tests/test02/input > out02
+cat  tetris.lisp utl ../tests/test04/input > out04
+cat  tetris.lisp utl ../tests/test06/input > out06
+cat  tetris.lisp utl ../tests/test08/input > out08
+cat  tetris.lisp utl ../tests/test10/input > out10
+cat  tetris.lisp utl ../tests/test12/input > out12
+cat  tetris.lisp utl ../tests/test14/input > out14
+cat  tetris.lisp utl ../tests/test17/input > out17
+
+clisp < out02 > tst
+echo 'TEST 2'
+sed -n '/^T$/ { s///; :a; n; p; ba; }' tst > tst1
+diff tst1 ../customtests/test02/output
+
+clisp < out04 > tst
+echo 'TEST 4'
+sed -n '/^T$/ { s///; :a; n; p; ba; }' tst > tst1
+diff tst1 ../customtests/test04/output
+
+clisp < out06 > tst
+echo 'TEST 6'
+sed -n '/^T$/ { s///; :a; n; p; ba; }' tst > tst1
+diff tst1 ../customtests/test06/output
+
+clisp < out08 > tst
+echo 'TEST 8'
+sed -n '/^T$/ { s///; :a; n; p; ba; }' tst > tst1
+diff tst1 ../customtests/test08/output
+
+clisp < out10 > tst
+echo 'TEST 10'
+sed -n '/^T$/ { s///; :a; n; p; ba; }' tst > tst1
+diff tst1 ../customtests/test10/output
+
+clisp < out12 > tst
+echo 'TEST 12'
+sed -n '/^T$/ { s///; :a; n; p; ba; }' tst > tst1
+diff tst1 ../customtests/test12/output
+
+clisp < out14 > tst
+echo 'TEST 14'
+sed -n '/^T$/ { s///; :a; n; p; ba; }' tst > tst1
+diff tst1 ../customtests/test14/output
+
+clisp < out17 > tst
+echo 'TEST 17'
+sed -n '/^T$/ { s///; :a; n; p; ba; }' tst > tst1
+diff tst1 ../customtests/test17/output
+
+rm tst1 out* tst utl

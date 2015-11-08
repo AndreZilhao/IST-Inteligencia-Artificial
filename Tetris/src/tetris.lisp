@@ -1,8 +1,3 @@
-(load "utils.lisp")
-
-
-(+ 3 4)
-
 ;; Numero de colunas do tabuleiro
 (defparameter *num-colunas* 10)
 ;; Numero de linhas do tabuleiro
@@ -100,16 +95,15 @@
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
-		(let ((conta-coluna 0))
-			 
-			 (loop  for linha-actual from 0 to *max-linhas-index* 
-			 	   	    until (equal (aref tabuleiro linha-actual coluna) T) do
-			 	        	(setf conta-coluna (+ conta-coluna 1)))
+		(let ((conta-coluna *num-linhas*)
+			  (coluna-toda-preenchida T))
+			 	(loop for linha-actual from 0 to *max-linhas-index* 
+			 	   	  until (equal (aref tabuleiro linha-actual coluna) T) 
+			 				 do
+			 				 	(decf conta-coluna))
+			 				  	;(setf coluna-toda-preenchida nil))
+			  conta-coluna))	
 
-			 (let ((linha-resultado (maplinha conta-coluna)))
-			 	   (if (< linha-resultado 0)
-			 	 		0
-			 	 		linha-resultado))))
 				
 
 
@@ -162,7 +156,7 @@
 ; Altera o tabuleiro recebido. Remove a linha numero passada no 
 ; argunmento linha. Desce as restantes linha uma posicao e acrecenta
 ; uma nova linha no topo com todas as posicoes vazias
-(defun tabuleiros-remove-linha! (tabuleiro linha)
+(defun tabuleiro-remove-linha! (tabuleiro linha)
 		(let ((tabuleiros-iguais nil)
 			  (linha-mapeada (maplinha linha)))
 			 	
@@ -175,11 +169,26 @@
 			 	        				  (setf (aref tabuleiro linha-actual coluna-actual)
 			 	        						(aref tabuleiro linha-anterior coluna-actual))))))))
 
+
 ;Reconhecedor
-; tabuleiro-topo-preenchido-p : tabuleiro --> T se a linha do topo estiver toda preenchida
+; tabuleiro-topo-preenchido-p : tabuleiro x linha --> T se a linha indicada tiver algum valor preenchido
+; tabuleiro --> array bidimensional que representa um tabuleiro
+; linha --> inteiro [0,17] que representa a linha do tabuleiro a ser verificada
+(defun verifica-linha-preenchida-p (tab linha)
+	(let ((valor-posicao-actual nil))
+	  	  (loop for coluna-actual from 0 to *max-colunas-index* 
+  			  	until (equal valor-posicao-actual T) do
+	 	        	(if (equal (aref tab linha coluna-actual) T) 
+	 	        		(setf valor-posicao-actual T)))
+	   	  valor-posicao-actual))
+
+;Reconhecedor
+; tabuleiro-topo-preenchido-p : tabuleiro --> T se a linha do topo tiver algum valor preenchido
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 (defun tabuleiro-topo-preenchido-p (tabuleiro)
-	(tabuleiro-linha-completa-p tabuleiro *max-linhas-index*))
+	(verifica-linha-preenchida-p tabuleiro (maplinha *max-linhas-index*)))
+
+
 
 
 ;Reconhecedor
@@ -220,15 +229,55 @@
 
 
 ; TAI Estado
+; Implementado utilizando uma estrutura
+; pontos - numero de pontos
+; pecas-por-colocar - lista com pecas por colocar. As pecas devem estar ordenadas.
+;					  (e.g i,j,l,o,s,z,t)
+; pecas-colocadas - lista com pecas ja colocados. Esta lista deve estar ordenada
+; tabuleiro - implementacao de um tabuleiro					  
 (defstruct estado pontos pecas-por-colocar pecas-colocadas tabuleiro)
 
+; Faz uma copia do estado recebido. Este estado ira estar numa posicao de memoria distinta 
+; do recebido por input
 (defun copia-estado (estado-a-copiar)
-	(make-estado :pontos (estado-a-copiar-pontos)))
+	(make-estado :pontos (estado-pontos estado-a-copiar) 
+				 :pecas-por-colocar (copy-list (estado-pecas-por-colocar estado-a-copiar))
+				 :pecas-colocadas (copy-list (estado-pecas-colocadas estado-a-copiar))
+				 :tabuleiro (copia-tabuleiro (estado-tabuleiro estado-a-copiar))))
+
+; Verifica se dois estados sao iguais.
+(defun estados-iguais-p (estado1 estado2)
+	(and (= (estado-pontos estado1) 
+		    (estado-pontos estado2))
+		 (equal (estado-pecas-por-colocar estado1) 
+		 		(estado-pecas-por-colocar estado2))
+		 (equal (estado-pecas-colocadas estado1) 
+		 		(estado-pecas-colocadas estado2))
+		 (tabuleiros-iguais-p (estado-tabuleiro estado1) 
+		 					  (estado-tabuleiro estado2))))
+
+; Verifica se um estado e final
+(defun estado-final-p (estado-a-verificar)
+	(or (tabuleiro-topo-preenchido-p (estado-tabuleiro estado-a-verificar))
+		(equal (estado-pecas-por-colocar estado-a-verificar) '())))
+
+; TAI Problema - Representa um problema generico de procura
+;
+; Implementado utilizando uma estrutura
+; estado - estado inicial do procura de procura
+; solucao - funcao que recebe um estado e verifica se e uma solucao para 
+;			o problema de procura
+; accoes - funcao que recebe um estado e devolve todas as accoes possiveis
+;		    desse estado
+; resultado - lista com pecas ja colocados. Esta lista deve estar ordenada
+; custo-caminho - implementacao de um tabuleiro					  
+(defstruct problema estado-inicial solucao accoes resultado custo-caminho)
+
 
 
 
 ; Tabuleiro de exemplo!!!!!
-(defun tab-ex ()
+(defun tab-ex1 ()
 	(let ((a (cria-tabuleiro)))
 		(progn
 			(tabuleiro-preenche! a 1 0)
@@ -254,9 +303,44 @@
 			(tabuleiro-preenche! a 3 0)
 			(tabuleiro-preenche! a 3 1)
 			(tabuleiro-preenche! a 4 9)
+			(tabuleiro-preenche! a 8 8)
 			a)))
 
-(defun estado-exemplo ()
-		(make-estado :pontos 4 :pecas-por-colocar '()))
+; Tabuleiro de exemplo!!!!!
+(defun tab-ex2 ()
+	(let ((a (cria-tabuleiro)))
+		(progn
+			(tabuleiro-preenche! a 1 0)
+			(tabuleiro-preenche! a 1 1)
+			(tabuleiro-preenche! a 1 2)
+			(tabuleiro-preenche! a 1 3)
+			(tabuleiro-preenche! a 1 4)
+			(tabuleiro-preenche! a 1 5)
+			(tabuleiro-preenche! a 1 6)
+			(tabuleiro-preenche! a 1 7)
+			(tabuleiro-preenche! a 1 8)
+			(tabuleiro-preenche! a 1 9)
+			(tabuleiro-preenche! a 17 0)
+			(tabuleiro-preenche! a 17 1)
+			(tabuleiro-preenche! a 17 2)
+			(tabuleiro-preenche! a 17 3)
+			(tabuleiro-preenche! a 17 4)
+			(tabuleiro-preenche! a 17 5)
+			(tabuleiro-preenche! a 17 6)
+			(tabuleiro-preenche! a 17 7)
+			(tabuleiro-preenche! a 17 8)
+			(tabuleiro-preenche! a 17 9)
+			(tabuleiro-preenche! a 3 0)
+			(tabuleiro-preenche! a 3 1)
+			(tabuleiro-preenche! a 4 9)
 
+			a)))
 
+(defun estado-exemplo1 ()
+		(make-estado :pontos 4 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))
+
+(defun estado-exemplo2 ()
+		(make-estado :pontos 19 :pecas-por-colocar '(l) :pecas-colocadas '(i o t) :tabuleiro (tab-ex2)))
+
+(defun estado-exemplo3 ()
+		(make-estado :pontos 3 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))
