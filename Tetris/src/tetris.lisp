@@ -1,4 +1,4 @@
-;(load "utils.fas")
+(load "utils.fas")
 ;; Numero de colunas do tabuleiro
 (defparameter NUM-COLUNAS 10)
 ;; Numero de linhas do tabuleiro
@@ -311,12 +311,28 @@
 	)
 
 (defun qualidade (estado)
-  (- 0 (estado-pontos estado)))
+	(- 0 (estado-pontos estado)))
 
-;(defun custo-oportunidade (estado)
-;  (let ((pontos ())
-;		(lista-accoes '()))
-;  ))
+(defun custo-oportunidade (estado)
+	(let* ((pontos (estado-pontos estado))
+		(pontos-totais 0)
+		(pecas-colocadas (estado-pecas-colocadas estado))
+		(tamanho-lista-pecas (length pecas-colocadas)))
+	(loop for a from 1 to tamanho-lista-pecas do
+		(progn
+			(case (car pecas-colocadas)
+				(i (setf pontos-totais (+ pontos-totais 800)))
+				(l (setf pontos-totais (+ pontos-totais 500)))
+				(o (setf pontos-totais (+ pontos-totais 300)))
+				(j (setf pontos-totais (+ pontos-totais 500)))
+				(s (setf pontos-totais (+ pontos-totais 300)))
+				(z (setf pontos-totais (+ pontos-totais 300)))
+				(t (setf pontos-totais (+ pontos-totais 300)))
+				)
+		(setf pecas-colocadas (cdr pecas-colocadas)))
+  		)
+	(- pontos-totais pontos))
+ )
 
 
 ; Tabuleiro de exemplo!!!!!
