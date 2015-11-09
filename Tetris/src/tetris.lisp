@@ -1,4 +1,4 @@
-(load "utils.fas")
+(load "utils.lisp")
 ;; Numero de colunas do tabuleiro
 (defparameter NUM-COLUNAS 10)
 ;; Numero de linhas do tabuleiro
@@ -67,7 +67,10 @@
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
-	(not (equal (aref tabuleiro (maplinha linha) coluna) 'F)))
+	(if (and (numberp linha) (numberp coluna)
+		(>= linha 0) (<= linha MAX-LINHAS-INDEX)
+		(>= coluna 0) (<= coluna MAX-COLUNAS-INDEX))
+	(not (equal (aref tabuleiro (maplinha linha) coluna) 'F))))
 
 
 
@@ -314,7 +317,8 @@
 	(- 0 (estado-pontos estado)))
 
 (defun custo-oportunidade (estado)
-	(let* ((pontos (estado-pontos estado))
+	(let* (
+		(pontos (estado-pontos estado))
 		(pontos-totais 0)
 		(pecas-colocadas (estado-pecas-colocadas estado))
 		(tamanho-lista-pecas (length pecas-colocadas)))
@@ -329,11 +333,68 @@
 				(z (setf pontos-totais (+ pontos-totais 300)))
 				(t (setf pontos-totais (+ pontos-totais 300)))
 				)
-		(setf pecas-colocadas (cdr pecas-colocadas)))
-  		)
+			(setf pecas-colocadas (cdr pecas-colocadas)))
+		)
 	(- pontos-totais pontos))
- )
+	)
 
+(defun verifica-posicao (tabuleiro linha coluna peca)
+	(let* (
+		(peca-altura (array-dimension peca 0))
+		(peca-largura (array-dimension peca 1))
+		(posicao-invalida nil)
+		(index-linha 0))
+	(loop for b from 1 to peca-altura do
+		(let ((index-coluna 0))
+			(loop for a from 1 to peca-largura do
+				(progn
+					(if  
+						(if (equal (aref peca index-linha index-coluna) T)
+							(tabuleiro-preenchido-p tabuleiro (+ linha index-linha) (+ coluna index-coluna)))
+						(setf posicao-invalida T))
+					)
+				(setf index-coluna (+ index-coluna 1)))
+			(setf index-linha (+ index-linha 1))))
+	posicao-invalida)
+	)
+
+(defun preenche-peca (tabuleiro linha coluna peca)
+  	(let* (
+		(peca-altura (array-dimension peca 0))
+		(peca-largura (array-dimension peca 1))
+		(index-linha 0))
+	(loop for b from 1 to peca-altura do
+		(let ((index-coluna 0))
+			(loop for a from 1 to peca-largura do
+				(progn
+						(if (equal (aref peca index-linha index-coluna) T)
+							(tabuleiro-preenche! tabuleiro (+ linha index-linha) (+ coluna index-coluna)))
+      						)
+				(setf index-coluna (+ index-coluna 1)))
+			(setf index-linha (+ index-linha 1)))))
+  )
+
+(defun resultado (estado accao)
+	(let* (
+		(novo-estado (copia-estado estado))
+		(coluna (accao-coluna accao))
+		(peca (accao-peca accao))
+		(linha MAX-LINHAS-INDEX)
+		(linha-final MAX-LINHAS-INDEX)
+		(posicao T))
+	(progn
+		(loop for a from linha downto 0 while (equal posicao T)  do
+			(if (verifica-posicao (estado-tabuleiro estado) a coluna peca)
+				(progn
+					(princ a)
+					(setf posicao nil)
+					(setf linha-final a)
+					)
+				))
+		(preenche-peca (estado-tabuleiro novo-estado) (+ 1 linha-final) coluna  peca)
+		)
+	novo-estado)
+	)
 
 ; Tabuleiro de exemplo!!!!!
 (defun tab-ex1 ()
@@ -349,19 +410,9 @@
 			(tabuleiro-preenche! a 1 7)
 			(tabuleiro-preenche! a 1 8)
 			(tabuleiro-preenche! a 1 9)
-			(tabuleiro-preenche! a 17 0)
-			(tabuleiro-preenche! a 17 1)
-			(tabuleiro-preenche! a 17 2)
-			(tabuleiro-preenche! a 17 3)
-			(tabuleiro-preenche! a 17 4)
-			(tabuleiro-preenche! a 17 5)
-			(tabuleiro-preenche! a 17 6)
-			(tabuleiro-preenche! a 17 7)
-			(tabuleiro-preenche! a 17 8)
-			(tabuleiro-preenche! a 17 9)
 			(tabuleiro-preenche! a 3 0)
 			(tabuleiro-preenche! a 3 1)
-			(tabuleiro-preenche! a 4 9)
+			(tabuleiro-preenche! a 4 3)
 			(tabuleiro-preenche! a 8 8)
 			a)))
 
