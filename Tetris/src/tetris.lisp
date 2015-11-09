@@ -1,4 +1,4 @@
-(load "utils.lisp")
+(load "utils.fas")
 ;; Numero de colunas do tabuleiro
 (defparameter NUM-COLUNAS 10)
 ;; Numero de linhas do tabuleiro
@@ -382,8 +382,7 @@
 		(linha MAX-LINHAS-INDEX)
 		(linha-final (+ MAX-LINHAS-INDEX 1))
 		(posicao T)
-  		(conta-linhas-removidas 0)
-		(pontuacao 0))
+  		(conta-linhas-removidas 0))
 	(progn
 ;VERIFICACAO DE QUAL A POSICAO DA PECA NOVA
 		(loop for a from linha downto 0 while (equal posicao T)  do
@@ -402,8 +401,6 @@
 		 		novo-estado
 		 		(loop for linha from 0 to MAX-LINHAS-INDEX do
 		 			(progn 
-		 				(princ " | ")
-		 				(princ linha)
 		 			(if (equal (tabuleiro-linha-completa-p (estado-tabuleiro novo-estado) linha) T)
 		 				(progn (incf conta-linhas-removidas)
 		 					   (tabuleiro-remove-linha! (estado-tabuleiro novo-estado) linha)
@@ -412,8 +409,12 @@
 		 	   ((= conta-linhas-removidas 3) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 500)))
 		 	   ((= conta-linhas-removidas 2) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 300)))
 		 	   ((= conta-linhas-removidas 1) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 100)))
-		 	   (t (setf (estado-pontos novo-estado) 0)))
+		 	  )
 ;ACTUALIZACAO DA LISTA DE PECAS COLOCADAS E PECAS POR COLOCAR 
+		(setf (estado-pecas-colocadas novo-estado) 
+        	(cons (car (estado-pecas-por-colocar novo-estado)) (estado-pecas-colocadas novo-estado)))
+		(setf (estado-pecas-por-colocar novo-estado)
+        	(cdr (estado-pecas-por-colocar novo-estado)))
 		)
 	novo-estado)
 	)
