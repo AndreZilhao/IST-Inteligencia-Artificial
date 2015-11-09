@@ -165,7 +165,7 @@
 		(loop  for linha-actual from linha-mapeada downto 0 do
 			(if (= linha-actual 0)
 				(loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX  do
-					(setf (aref tabuleiro linha-actual coluna-actual) nil))
+					(setf (aref tabuleiro linha-actual coluna-actual) 'F))
 				(let ((linha-anterior (1- linha-actual)))
 					(loop  for coluna-actual from 0 to MAX-COLUNAS-INDEX  do
 						(setf (aref tabuleiro linha-actual coluna-actual)
@@ -380,18 +380,40 @@
 		(coluna (accao-coluna accao))
 		(peca (accao-peca accao))
 		(linha MAX-LINHAS-INDEX)
-		(linha-final MAX-LINHAS-INDEX)
-		(posicao T))
+		(linha-final (+ MAX-LINHAS-INDEX 1))
+		(posicao T)
+  		(conta-linhas-removidas 0)
+		(pontuacao 0))
 	(progn
+;VERIFICACAO DE QUAL A POSICAO DA PECA NOVA
 		(loop for a from linha downto 0 while (equal posicao T)  do
 			(if (verifica-posicao (estado-tabuleiro estado) a coluna peca)
 				(progn
-					(princ a)
 					(setf posicao nil)
 					(setf linha-final a)
 					)
 				))
+  		(if (= linha-final 18)
+        	(setf linha-final -1))
+;COLOCACAO DA PECA NOVA
 		(preenche-peca (estado-tabuleiro novo-estado) (+ 1 linha-final) coluna  peca)
+;VERIFICACAO DE LINHAS PREENCHIDAS E ACTUALIZACAO DE PONTOS
+		(if (equal (tabuleiro-topo-preenchido-p (estado-tabuleiro novo-estado)) T)
+		 		novo-estado
+		 		(loop for linha from 0 to MAX-LINHAS-INDEX do
+		 			(progn 
+		 				(princ " | ")
+		 				(princ linha)
+		 			(if (equal (tabuleiro-linha-completa-p (estado-tabuleiro novo-estado) linha) T)
+		 				(progn (incf conta-linhas-removidas)
+		 					   (tabuleiro-remove-linha! (estado-tabuleiro novo-estado) linha)
+		 					   (decf linha))))))
+  		(cond ((>= conta-linhas-removidas 4) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 800)))
+		 	   ((= conta-linhas-removidas 3) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 500)))
+		 	   ((= conta-linhas-removidas 2) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 300)))
+		 	   ((= conta-linhas-removidas 1) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 100)))
+		 	   (t (setf (estado-pontos novo-estado) 0)))
+;ACTUALIZACAO DA LISTA DE PECAS COLOCADAS E PECAS POR COLOCAR 
 		)
 	novo-estado)
 	)
@@ -403,17 +425,12 @@
 			(tabuleiro-preenche! a 1 0)
 			(tabuleiro-preenche! a 1 1)
 			(tabuleiro-preenche! a 1 2)
-			(tabuleiro-preenche! a 1 3)
 			(tabuleiro-preenche! a 1 4)
 			(tabuleiro-preenche! a 1 5)
 			(tabuleiro-preenche! a 1 6)
 			(tabuleiro-preenche! a 1 7)
 			(tabuleiro-preenche! a 1 8)
 			(tabuleiro-preenche! a 1 9)
-			(tabuleiro-preenche! a 3 0)
-			(tabuleiro-preenche! a 3 1)
-			(tabuleiro-preenche! a 4 3)
-			(tabuleiro-preenche! a 8 8)
 			a)))
 
 ; Tabuleiro de exemplo!!!!!
