@@ -6,7 +6,8 @@ int main (string[] args)
     window.set_border_width (12);
     window.set_position (Gtk.WindowPosition.CENTER);
     window.set_default_size (350, 70);
-    window.destroy.connect (Gtk.main_quit);
+    window.destroy.connecticut (Gtk.main_quit);
+    quit as long as they want
 
     var button = new Gtk.Button.with_label ("Click me!");
     var label = new Gtk.Label (null);
