@@ -1,4 +1,4 @@
-(load "utils.fas")
+(load "utils.lisp")
 ;; Numero de colunas do tabuleiro
 (defparameter NUM-COLUNAS 10)
 ;; Numero de linhas do tabuleiro
@@ -73,27 +73,6 @@
 	(not (equal (aref tabuleiro (maplinha linha) coluna) 'F))))
 
 
-
-; ---------------------- Apenas guardado para ver como se faz debug --------------------
-;(defun altura-coluna (tabuleiro coluna)
-;		(let ((conta-coluna 0))
-;			 (loop  for linha-actual from 0 to MAX-LINHAS-INDEX 
-;			 			until (equal (aref tabuleiro linha-actual coluna) T) do ; until (> linha-actual 10) do 
-;			 	    		(progn 
-;			 	    			;(princ (equal (aref tabuleiro linha-actual coluna) nil))
-;			 	    			(princ "Linha actual")
-;			 	    			(princ linha-actual)
-;			 	    			;(princ conta-coluna)
-;			 	    			;(princ " ") 
-;			 	    			(setf conta-coluna (+ conta-coluna 1))
-;
-;			 	    		))
-;			 (maplinha conta-coluna)))
-; -------------------------------------- END --------------------------------------
-
-
-
-
 ; tabuleiro altura-coluna : tabuleiro x coluna --> inteiro que representa a linha mais elevada ocupada
 ;										 	       da coluna recebida
 ; tabuleiro --> array bidimensional que representa um tabuleiro
@@ -109,25 +88,13 @@
 
 
 
-
-; ----------------- Apenas guardado porque sim ----------------------
-;(defun altura-coluna (tabuleiro coluna)
-;		(let ((conta-coluna 0))
-;			 (progn
-;			 	(dotimes MAX-LINHAS-INDEX) 
-;				 	while (equal (tabuleiro-preenchido-p tabuleiro nlinha coluna) nil) do
-;			 			(setf conta-coluna nlinha)
-;			 conta-coluna)))
-; ---------------------------- END ---------------------------------
-
-
-
 ; Reconhecedor
 ; tabuleiro-linha-completa-p : tabuleiro x linha --> T se a linha estiver toda preenchida
 ; tabuleiro --> array bidimensional que representa um tabuleiro
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro
 (defun tabuleiro-linha-completa-p (tabuleiro linha)
-	(let ((conta-colunas-preenchidas 0)
+	(let (
+       	(conta-colunas-preenchidas 0)
 		(linha-a-verificar (maplinha linha)))
 
 	(loop for coluna-actual from 0 to MAX-COLUNAS-INDEX 
@@ -374,6 +341,8 @@
 			(setf index-linha (+ index-linha 1)))))
   )
 
+
+;
 (defun resultado (estado accao)
 	(let* (
 		(novo-estado (copia-estado estado))
@@ -419,50 +388,7 @@
 	novo-estado)
 	)
 
-; Tabuleiro de exemplo!!!!!
-(defun tab-ex1 ()
-	(let ((a (cria-tabuleiro)))
-		(progn
-			(tabuleiro-preenche! a 1 0)
-			(tabuleiro-preenche! a 1 1)
-			(tabuleiro-preenche! a 1 2)
-			(tabuleiro-preenche! a 1 4)
-			(tabuleiro-preenche! a 1 5)
-			(tabuleiro-preenche! a 1 6)
-			(tabuleiro-preenche! a 1 7)
-			(tabuleiro-preenche! a 1 8)
-			(tabuleiro-preenche! a 1 9)
-			a)))
-
-; Tabuleiro de exemplo!!!!!
-(defun tab-ex2 ()
-	(let ((a (cria-tabuleiro)))
-		(progn
-			(tabuleiro-preenche! a 1 0)
-			(tabuleiro-preenche! a 1 1)
-			(tabuleiro-preenche! a 1 2)
-			(tabuleiro-preenche! a 1 3)
-			(tabuleiro-preenche! a 1 4)
-			(tabuleiro-preenche! a 1 5)
-			(tabuleiro-preenche! a 1 6)
-			(tabuleiro-preenche! a 1 7)
-			(tabuleiro-preenche! a 1 8)
-			(tabuleiro-preenche! a 1 9)
-			(tabuleiro-preenche! a 17 0)
-			(tabuleiro-preenche! a 17 1)
-			(tabuleiro-preenche! a 17 2)
-			(tabuleiro-preenche! a 17 3)
-			(tabuleiro-preenche! a 17 4)
-			(tabuleiro-preenche! a 17 5)
-			(tabuleiro-preenche! a 17 6)
-			(tabuleiro-preenche! a 17 7)
-			(tabuleiro-preenche! a 17 8)
-			(tabuleiro-preenche! a 17 9)
-			(tabuleiro-preenche! a 3 0)
-			(tabuleiro-preenche! a 3 1)
-			(tabuleiro-preenche! a 4 9)
-			a)))
-
+; Tabuleiro
 ;--
 (defun estado-exemplo1 ()
 	(make-estado :pontos 4 :pecas-por-colocar '(i o j l t) :pecas-colocadas '(i o) :tabuleiro (tab-ex1)))

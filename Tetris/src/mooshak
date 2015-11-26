@@ -1,5 +1,4 @@
-#!/bin/bash
-# My first script
+
 echo '(load "utilsaux.lisp")' > utl
 cat  tetris.lisp utl  ../tests/test02/input > out02
 cat  tetris.lisp utl ../tests/test04/input > out04
@@ -9,6 +8,7 @@ cat  tetris.lisp utl ../tests/test10/input > out10
 cat  tetris.lisp utl ../tests/test12/input > out12
 cat  tetris.lisp utl ../tests/test14/input > out14
 cat  tetris.lisp utl ../tests/test17/input > out17
+cat  tetris.lisp utl ../tests/test18/input > out18
 
 clisp < out02 > tst
 echo 'TEST 2'
