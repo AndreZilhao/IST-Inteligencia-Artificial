@@ -374,9 +374,78 @@ novo-estado)
 ;;---------------------------------------------|                  |----------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------
 
-(defun procura-pp (problema-actual)
-	(let ((resultado-final nil)
-		   (proximo-estado (resultado (problema-estado-inicial problema-actual) (problema-accoes problema-actual)))
-		   (lista-accoes (reverse (problema-estado problema-actual))))
-			lista-accoes))
+;(defun procura-pp (problema)
+;	(let ((resultado-final nil)
+;		  (estado1 (problema-estado-inicial problema))
+;		  (accoes1 (accoes (problema-estado-inicial problema))))
+;		(progn (setf resultado-final (resultado estado1 (car accoes1))))
+;	resultado-final))
+
+(defun procura-pp (problema)
+
+		(setf iii 0)
+		(setf solucao nil)
+		(setf novalista '())
+		(setf lista-accoes-solucoes '())
+
+(defun procura-pp1 (problema lista-accoes-solucoes)
+	(let* ((resultado-recursivo lista-accoes-solucoes)
+		  (estado1 (problema-estado-inicial problema))
+		  (accoes1 (reverse (funcall (problema-accoes problema) estado1)))
+		  (estado-pos nil)
+		  (accoes-pos nil))
+	
+	(if (funcall (problema-solucao problema) estado1)
+		(progn
+				(setf solucao T)
+				;(princ resultado-recursivo)
+				(setf novalista (reverse resultado-recursivo)))
+				(dolist (i accoes1) 
+					;(princ i)
+					(if (equal solucao nil)
+
+					(progn
+						(setf estado-pos (funcall (problema-resultado problema) estado1 i))
+						(setf (problema-estado-inicial problema) estado-pos)
+						;(setf resultado-recursivo (cons resultado-recursivo i))
+						(incf iii)
+						;(princ estado-pos)
+						(setf lista-accoes-solucoes (append (list i) lista-accoes-solucoes))
+						;(princ lista-accoes-solucoes)
+						 (procura-pp1 problema lista-accoes-solucoes)
+						 (setf lista-accoes-solucoes (cdr lista-accoes-solucoes)))
+						))
+				)
+				)
+	
+	)
+		(procura-pp1 problema lista-accoes-solucoes)
+		;(princ lista-accoes-solucoes)
+		;lista-accoes-solucoes
+		novalista
+		)
+	
+		 
+;	(let ((resultado-final nil)
+;		  (proximo-estado (resultado (problema-estado-inicial problema-actual) (problema-accoes problema-actual)))
+;		   (lista-accoes (reverse (problema-estado problema-actual))))
+;			lista-accoes))
 ;(load "utils.lisp")
+
+;(defun procura-pp-recursivo (estado)
+;	(let ((resultado-recursivo nil)
+;		  (estado-inicial estado)
+;		  (accao-inicial accao)
+;		  (estado-pos nil)
+;		  (accoes-pos nil))
+
+
+;		())
+
+
+;(setf t1 (cria-tabuleiro))
+;(dotimes (coluna 9) (tabuleiro-preenche! t1 0 (+ coluna 1))(tabuleiro-preenche! t1 1 (+ coluna 1))(tabuleiro-preenche! t1 2 (+ coluna 1)))
+;(setf p1 (make-problema :estado-inicial (make-estado :pontos 0 :tabuleiro t1 :pecas-colocadas ()
+; :pecas-por-colocar '(o o o o o l l t t j j i i i i i)) :solucao #'solucao :accoes #'accoes
+;  :resultado #'resultado :custo-caminho #'(lambda (x) 0)))
+(load "utils.fas")
