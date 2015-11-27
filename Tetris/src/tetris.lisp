@@ -383,17 +383,16 @@ novo-estado)
 
 (defun procura-pp (problema)
 
-		(setf iii 0)
-		(setf solucao nil)
-		(setf novalista '())
-		(setf lista-accoes-solucoes '())
+		(let ((iii 0)
+			  (solucao nil)
+		      (novalista '())
+		      (lista-accoes-solucoes '()))
 
 (defun procura-pp1 (problema lista-accoes-solucoes)
 	(let* ((resultado-recursivo lista-accoes-solucoes)
 		  (estado1 (problema-estado-inicial problema))
 		  (accoes1 (reverse (funcall (problema-accoes problema) estado1)))
-		  (estado-pos nil)
-		  (accoes-pos nil))
+		  (estado-pos nil))
 	
 	(if (funcall (problema-solucao problema) estado1)
 		(progn
@@ -423,7 +422,7 @@ novo-estado)
 		;(princ lista-accoes-solucoes)
 		;lista-accoes-solucoes
 		novalista
-		)
+		))
 	
 		 
 ;	(let ((resultado-final nil)
