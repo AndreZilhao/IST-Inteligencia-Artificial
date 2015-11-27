@@ -374,7 +374,9 @@ novo-estado)
 ;;---------------------------------------------|                  |----------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------
 
-(defun procura-pp (problema)
-	;lista-accoes
-	)
+(defun procura-pp (problema-actual)
+	(let ((resultado-final nil)
+		   (proximo-estado (resultado (problema-estado-inicial problema-actual) (problema-accoes problema-actual)))
+		   (lista-accoes (reverse (problema-estado problema-actual))))
+			lista-accoes))
 ;(load "utils.lisp")

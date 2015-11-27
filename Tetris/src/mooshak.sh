@@ -1,5 +1,5 @@
 #!/bin/bash
-echo '(load "utilsaux.lisp")' > utl
+echo '(load "utils.lisp")' > utl
 cat  tetris.lisp utl ../tests/test01/input > out01
 cat  tetris.lisp utl ../tests/test02/input > out02
 cat  tetris.lisp utl ../tests/test03/input > out03
