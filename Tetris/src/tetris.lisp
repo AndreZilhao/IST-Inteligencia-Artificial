@@ -10,8 +10,8 @@
 (defparameter *num-linhas* 18)
 
 ;; Indices maximos das colunas e das linhas do tabuleiro
-(defparameter *max-colunas-index* 9)
-(defparameter *max-linhas-index* 17)
+(defparameter *max-colunas-index* (- *num-colunas* 1))
+(defparameter *max-linhas-index* (- *num-linhas* 1))
 
 ; Funcao auxiliar que mapeia a numeracao das linhas requerida no enunciado em que a linha 0 encontra-se 
 ; na posicaoo mais 'abaixo'
@@ -366,24 +366,16 @@
             		(estado-pecas-colocadas novo-estado)))
             (setf (estado-pecas-por-colocar novo-estado)
             	(cdr (estado-pecas-por-colocar novo-estado))))
-novo-estado)
-)
+novo-estado))
+
 ;;---------------------------------------------------------------------------------------------------------------
 ;;---------------------------------------------|                  |----------------------------------------------
 ;;------| Projecto IA 2015 - Grupo 27 |--------|      PARTE 2     |--------------|  Taguspark  |-----------------
 ;;---------------------------------------------|                  |----------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------
 
-;(defun procura-pp (problema)
-;	(let ((resultado-final nil)
-;		  (estado1 (problema-estado-inicial problema))
-;		  (accoes1 (accoes (problema-estado-inicial problema))))
-;		(progn (setf resultado-final (resultado estado1 (car accoes1))))
-;	resultado-final))
-
 (defun procura-pp (problema)
 
-<<<<<<< HEAD
 	(let ((solucao nil)
 	      (novalista '())
 	      (lista-accoes-solucoes '()))
@@ -408,84 +400,16 @@ novo-estado)
 
 	(procura-pp1 problema lista-accoes-solucoes)
 	novalista))
-=======
-		(let ((iii 0)
-			  (solucao nil)
-		      (novalista '())
-		      (lista-accoes-solucoes '()))
-
-(defun procura-pp1 (problema lista-accoes-solucoes)
-	(let* ((resultado-recursivo lista-accoes-solucoes)
-		  (estado1 (problema-estado-inicial problema))
-		  (accoes1 (reverse (funcall (problema-accoes problema) estado1)))
-		  (estado-pos nil))
-	
-	(if (funcall (problema-solucao problema) estado1)
-		(progn
-				(setf solucao T)
-				;(princ resultado-recursivo)
-				(setf novalista (reverse resultado-recursivo)))
-				(dolist (i accoes1) 
-					;(princ i)
-					(if (equal solucao nil)
-
-					(progn
-						(setf estado-pos (funcall (problema-resultado problema) estado1 i))
-						(setf (problema-estado-inicial problema) estado-pos)
-						;(setf resultado-recursivo (cons resultado-recursivo i))
-						(incf iii)
-						;(princ estado-pos)
-						(setf lista-accoes-solucoes (append (list i) lista-accoes-solucoes))
-						;(princ lista-accoes-solucoes)
-						 (procura-pp1 problema lista-accoes-solucoes)
-						 (setf lista-accoes-solucoes (cdr lista-accoes-solucoes)))
-						))
-				)
-				)
-	
-	)
-		(procura-pp1 problema lista-accoes-solucoes)
-		;(princ lista-accoes-solucoes)
-		;lista-accoes-solucoes
-		novalista
-		))
->>>>>>> 8e35720653e12942800e21e9991a5edfb689a651
-	
-		 
-;	(let ((resultado-final nil)
-;		  (proximo-estado (resultado (problema-estado-inicial problema-actual) (problema-accoes problema-actual)))
-;		   (lista-accoes (reverse (problema-estado problema-actual))))
-;			lista-accoes))
-;(load "utils.lisp")
-
-;(defun procura-pp-recursivo (estado)
-;	(let ((resultado-recursivo nil)
-;		  (estado-inicial estado)
-;		  (accao-inicial accao)
-;		  (estado-pos nil)
-;		  (accoes-pos nil))
-
-
-;		())
-
-
-;(setf t1 (cria-tabuleiro))
-;(dotimes (coluna 9) (tabuleiro-preenche! t1 0 (+ coluna 1))(tabuleiro-preenche! t1 1 (+ coluna 1))(tabuleiro-preenche! t1 2 (+ coluna 1)))
-;(setf p1 (make-problema :estado-inicial (make-estado :pontos 0 :tabuleiro t1 :pecas-colocadas ()
-; :pecas-por-colocar '(o o o o o l l t t j j i i i i i)) :solucao #'solucao :accoes #'accoes
-;  :resultado #'resultado :custo-caminho #'(lambda (x) 0)))
-<<<<<<< HEAD
 
 (defun procura-A* (problema heuristica)
 	(let ((a (list problema heuristica)))
 		(setf a nil)
 		a))
 
-(defun procura-best* (array-tab pecas-p-colocar)
+(defun procura-best (array-tab pecas-p-colocar)
 	(let ((a (list array-tab pecas-p-colocar)))
 		(setf a nil)
 		a))
+
 (load "utils.fas")
-=======
-(load "utils.fas")
->>>>>>> 8e35720653e12942800e21e9991a5edfb689a651
+
