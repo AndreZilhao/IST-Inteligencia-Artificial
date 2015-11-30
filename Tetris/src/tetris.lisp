@@ -70,10 +70,9 @@
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
-	(if (and (numberp linha) (numberp coluna)
-		(>= linha 0) (<= linha *max-linhas-index*)
-		(>= coluna 0) (<= coluna *max-colunas-index*))
-	(not (equal (aref tabuleiro (maplinha linha) coluna) nil))))
+		;(>= linha 0) (<= linha *max-linhas-index*)
+		;(>= coluna 0) (<= coluna *max-colunas-index*)
+	(not (equal (aref tabuleiro (maplinha linha) coluna) nil)))
 
 ; tabuleiro altura-coluna : tabuleiro x coluna --> inteiro que representa a linha mais elevada ocupada
 ;										 	       da coluna recebida
@@ -294,6 +293,9 @@
 			(setf pecas-colocadas (cdr pecas-colocadas))))
 	(- pontos-totais pontos)))
 
+
+;
+;OPTIMIZAR ESTA VERIFICACAO
 ;verifica posicao da peca nova a colocar
 (defun verifica-posicao (tabuleiro linha coluna peca)
 	(let* (
@@ -305,7 +307,15 @@
 		(let ((index-coluna 0))
 			(loop for a from 1 to peca-largura do
 				(if  (if (equal (aref peca index-linha index-coluna) T)
-					(tabuleiro-preenchido-p tabuleiro (+ linha index-linha) (+ coluna index-coluna)))
+					(progn
+						;(princ (+ coluna index-coluna))
+						;(princ " ")
+						;(if (and (T) (T))
+						(if (and
+						 (<= (+ linha index-linha) *max-linhas-index*))
+						 ;(<=  (+ coluna index-coluna) *max-colunas-index*))
+						(tabuleiro-preenchido-p tabuleiro (+ linha index-linha) (+ coluna index-coluna))))
+					)
 				(setf posicao-invalida T))
 				(setf index-coluna (+ index-coluna 1)))
 			(setf index-linha (+ index-linha 1))))
@@ -336,7 +346,8 @@
 		(linha-final (+ *max-linhas-index* 1))
 		(posicao T)
 		(conta-linhas-removidas 0))
-	(progn
+	(progn	
+			;(princ "comecei result")
             ;verifica posicao da peca nova a colocar
             (loop for a from linha downto 0 while (equal posicao T)  do
             	(if (verifica-posicao (estado-tabuleiro estado) a coluna peca)
@@ -346,6 +357,7 @@
             (if (= linha-final *num-linhas*)
             	(setf linha-final -1))
             ;coloca peca nova no tabuleiro
+            ;(princ "preenche-peca")
             (preenche-peca (estado-tabuleiro novo-estado) (+ 1 linha-final) coluna  peca)
             ;verificacao de linhas preenchidas e actualizacao de pontos
             (if (equal (tabuleiro-topo-preenchido-p (estado-tabuleiro novo-estado)) T)
@@ -356,16 +368,17 @@
             				(tabuleiro-remove-linha! (estado-tabuleiro novo-estado) linha)
             				(decf linha)))))
             (cond ((>= conta-linhas-removidas 4) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 800)))
-            	((= conta-linhas-removidas 3) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 500)))
-            	((= conta-linhas-removidas 2) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 300)))
-            	((= conta-linhas-removidas 1) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 100))))
-
+            	  ((= conta-linhas-removidas 3) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 500)))
+            	  ((= conta-linhas-removidas 2) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 300)))
+            	  ((= conta-linhas-removidas 1) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 100))))
+            ;(princ "verificacao")
             ;Actualizacao da lista de pecas colocadas e pecas por colocar
             (setf (estado-pecas-colocadas novo-estado) 
             	(cons (car (estado-pecas-por-colocar novo-estado)) 
             		(estado-pecas-colocadas novo-estado)))
             (setf (estado-pecas-por-colocar novo-estado)
             	(cdr (estado-pecas-por-colocar novo-estado))))
+			
 novo-estado))
 
 ;;---------------------------------------------------------------------------------------------------------------
@@ -392,6 +405,7 @@ novo-estado))
 					(dolist (accao-actual accoes1) 
 						(if (equal solucao nil)
 							(progn
+								;(princ "alolo")
 								(setf estado-pos (funcall (problema-resultado problema) estado1 accao-actual))
 								(setf (problema-estado-inicial problema) estado-pos)
 								(setf lista-accoes-solucoes (append (list accao-actual) lista-accoes-solucoes))
