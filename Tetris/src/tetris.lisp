@@ -3,6 +3,7 @@
 ;;------| Projecto IA 2015 - Grupo 27 |--------|      PARTE 1     |--------------|  Taguspark  |-----------------
 ;;---------------------------------------------|                  |----------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------
+;;----------------------57422 Tiago Teixeira-----63535 Joao Costa-----65865 Andre Santos-------------------------
 
 ;; Numero de colunas do tabuleiro
 (defparameter *num-colunas* 10)
@@ -72,7 +73,7 @@
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
 		;(>= linha 0) (<= linha *max-linhas-index*)
 		;(>= coluna 0) (<= coluna *max-colunas-index*)
-	(not (equal (aref tabuleiro (maplinha linha) coluna) nil)))
+		(not (equal (aref tabuleiro (maplinha linha) coluna) nil)))
 
 ; tabuleiro altura-coluna : tabuleiro x coluna --> inteiro que representa a linha mais elevada ocupada
 ;										 	       da coluna recebida
@@ -181,7 +182,7 @@
 ;							   logo a transformacao e directa.
 ;tabuleiro --> array a partir do qual ira ser criado um novo tabuleiro
 (defun array->tabuleiro (tabuleiro)
-	(copia-tabuleiro tabuleiro))
+	(tabuleiro->array tabuleiro))
 
 ; TAI Estado
 ; Implementado utilizando uma estrutura
@@ -266,6 +267,8 @@
 			(z (preenche-lista-accoes lista-accoes (list peca-z0 peca-z1)))
 			(t (preenche-lista-accoes lista-accoes (list peca-t0 peca-t1 peca-t2 peca-t3)))))))
 
+
+;HEURISTICAS-------------
 ; qualidade : estado -> inteiro
 ; Funcao que recebe um estado e devolve um valor de qualidade correspondente ao valor negativo de pontos
 (defun qualidade (estado)
@@ -293,9 +296,32 @@
 			(setf pecas-colocadas (cdr pecas-colocadas))))
 	(- pontos-totais pontos)))
 
+; custo-oportunidade : estado -> inteiro
+; Devolve o custo de oportunidade de todas as accoes realizadas - da enfase a pecas que fazem varias linhas na vertical
+; como prioritarias e nao e admissivel, mas encontra solucoes rapidamente.
+(defun custo-oportunidade-cheap (estado)
+	(let* (
+		(pontos (estado-pontos estado))
+		(pontos-totais 0)
+		(pecas-colocadas (estado-pecas-colocadas estado))
+		(tamanho-lista-pecas (length pecas-colocadas)))
+	(loop for a from 1 to tamanho-lista-pecas do
+		(progn
+			(case (car pecas-colocadas)
+				(i (setf pontos-totais (+ pontos-totais 200)))
+				(l (setf pontos-totais (+ pontos-totais 200)))
+				(o (setf pontos-totais (+ pontos-totais 100)))
+				(j (setf pontos-totais (+ pontos-totais 200)))
+				(s (setf pontos-totais (+ pontos-totais 100)))
+				(z (setf pontos-totais (+ pontos-totais 100)))
+				(t (setf pontos-totais (+ pontos-totais 100))))
+			(setf pecas-colocadas (cdr pecas-colocadas))))
+	(- pontos-totais pontos)))
 
-;
-;OPTIMIZAR ESTA VERIFICACAO
+
+
+;TODO: OPTIMIZAR ESTA VERIFICACAO SE NECESSARIO
+;verifica-posicao: funcao auxiliar de resultado.
 ;verifica posicao da peca nova a colocar
 (defun verifica-posicao (tabuleiro linha coluna peca)
 	(let* (
@@ -308,12 +334,8 @@
 			(loop for a from 1 to peca-largura do
 				(if  (if (equal (aref peca index-linha index-coluna) T)
 					(progn
-						;(princ (+ coluna index-coluna))
-						;(princ " ")
-						;(if (and (T) (T))
 						(if (and
-						 (<= (+ linha index-linha) *max-linhas-index*))
-						 ;(<=  (+ coluna index-coluna) *max-colunas-index*))
+							(<= (+ linha index-linha) *max-linhas-index*))
 						(tabuleiro-preenchido-p tabuleiro (+ linha index-linha) (+ coluna index-coluna))))
 					)
 				(setf posicao-invalida T))
@@ -321,6 +343,7 @@
 			(setf index-linha (+ index-linha 1))))
 	posicao-invalida))
 
+;preenche-peca: funcao auxiliar de resultado.
 ;coloca peca nova no tabuleiro na linha e coluna indicada
 (defun preenche-peca (tabuleiro linha coluna peca)
 	(let* (
@@ -336,7 +359,7 @@
 			(setf index-linha (+ index-linha 1))))))
 
 ; resultado : estado x accao -> devolve novo estado que resulta da aplicacao da accao ao estado recebido
-
+; utiliza ainda 2 funcoes auxiliares para efectuar o preenchimento das pecas e a sua verificacao
 (defun resultado (estado accao)
 	(let* (
 		(novo-estado (copia-estado estado))
@@ -347,7 +370,6 @@
 		(posicao T)
 		(conta-linhas-removidas 0))
 	(progn	
-			;(princ "comecei result")
             ;verifica posicao da peca nova a colocar
             (loop for a from linha downto 0 while (equal posicao T)  do
             	(if (verifica-posicao (estado-tabuleiro estado) a coluna peca)
@@ -357,7 +379,6 @@
             (if (= linha-final *num-linhas*)
             	(setf linha-final -1))
             ;coloca peca nova no tabuleiro
-            ;(princ "preenche-peca")
             (preenche-peca (estado-tabuleiro novo-estado) (+ 1 linha-final) coluna  peca)
             ;verificacao de linhas preenchidas e actualizacao de pontos
             (if (equal (tabuleiro-topo-preenchido-p (estado-tabuleiro novo-estado)) T)
@@ -368,17 +389,16 @@
             				(tabuleiro-remove-linha! (estado-tabuleiro novo-estado) linha)
             				(decf linha)))))
             (cond ((>= conta-linhas-removidas 4) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 800)))
-            	  ((= conta-linhas-removidas 3) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 500)))
-            	  ((= conta-linhas-removidas 2) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 300)))
-            	  ((= conta-linhas-removidas 1) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 100))))
-            ;(princ "verificacao")
+            	((= conta-linhas-removidas 3) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 500)))
+            	((= conta-linhas-removidas 2) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 300)))
+            	((= conta-linhas-removidas 1) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 100))))
             ;Actualizacao da lista de pecas colocadas e pecas por colocar
             (setf (estado-pecas-colocadas novo-estado) 
             	(cons (car (estado-pecas-por-colocar novo-estado)) 
             		(estado-pecas-colocadas novo-estado)))
             (setf (estado-pecas-por-colocar novo-estado)
             	(cdr (estado-pecas-por-colocar novo-estado))))
-			
+
 novo-estado))
 
 ;;---------------------------------------------------------------------------------------------------------------
@@ -386,165 +406,111 @@ novo-estado))
 ;;------| Projecto IA 2015 - Grupo 27 |--------|      PARTE 2     |--------------|  Taguspark  |-----------------
 ;;---------------------------------------------|                  |----------------------------------------------
 ;;---------------------------------------------------------------------------------------------------------------
+;;----------------------57422 Tiago Teixeira-----63535 Joao Costa-----65865 Andre Santos-------------------------
 
+
+; Procuras nao informadas: profundidade primeiro (procura-pp)
+; Implementado utilizando uma funcao recursiva
+; problema - estrutura problema criada
+; devolve uma lista de pecas com a primeira solucao encontrada.
+; cria a lista de accoes dinamicamente.	
 (defun procura-pp (problema)
 
 	(let ((solucao nil)
-	      (novalista '())
-	      (lista-accoes-solucoes '()))
+		(novalista '())
+		(lista-accoes-solucoes '()))
 
-		(defun procura-pp1 (problema lista-accoes-solucoes)
-			(let* ((resultado-recursivo lista-accoes-solucoes)
-				  (estado1 (problema-estado-inicial problema))
-				  (accoes1 (reverse (funcall (problema-accoes problema) estado1)))
-				  (estado-pos nil))
-   				(if (funcall (problema-solucao problema) estado1)
+	;funcao de recursao usada na procura-pp
+	(defun procura-pp1 (problema lista-accoes-solucoes)
+		(let* ((resultado-recursivo lista-accoes-solucoes)
+			(estado1 (problema-estado-inicial problema))
+			(accoes1 (reverse (funcall (problema-accoes problema) estado1)))
+			(estado-pos nil))
+		(if (funcall (problema-solucao problema) estado1)
+			(progn
+				(setf solucao T)
+				(setf novalista (reverse resultado-recursivo)))
+			(dolist (accao-actual accoes1) 
+				(if (equal solucao nil)
 					(progn
-						(setf solucao T)
-						(setf novalista (reverse resultado-recursivo)))
-					(dolist (accao-actual accoes1) 
-						(if (equal solucao nil)
-							(progn
-								(setf estado-pos (funcall (problema-resultado problema) estado1 accao-actual))
-								(setf (problema-estado-inicial problema) estado-pos)
-								(setf lista-accoes-solucoes (append (list accao-actual) lista-accoes-solucoes))
-								(procura-pp1 problema lista-accoes-solucoes)
-								(setf lista-accoes-solucoes (cdr lista-accoes-solucoes))))))))
-
+						(setf estado-pos (funcall (problema-resultado problema) estado1 accao-actual))
+						(setf (problema-estado-inicial problema) estado-pos)
+						(setf lista-accoes-solucoes (append (list accao-actual) lista-accoes-solucoes))
+						(procura-pp1 problema lista-accoes-solucoes)
+						(setf lista-accoes-solucoes (cdr lista-accoes-solucoes))))))))
 	(procura-pp1 problema lista-accoes-solucoes)
-
 	novalista))	
-	
-(defun insert (item lst item-heuristic-value listactions)
-  (if (null lst)
-    (cons (list item item-heuristic-value listactions) lst)
-    (if (<= item-heuristic-value (second (car lst)))
-          (cons (list item item-heuristic-value listactions) lst) 
-          (cons (car lst) (insert item (cdr lst) item-heuristic-value listactions)))))
 
+
+;Funcao auxiliar insert
+;insere numa fronteira (lst) um (item) com um valore de heuristica (item-heuristic-value) e ainda
+;uma lista de accoes actualizada para o no.
+;devolve uma nova fronteira.
+(defun insert (item lst item-heuristic-value listactions)
+	(if (null lst)
+		(cons (list item item-heuristic-value listactions) lst)
+		(if (<= item-heuristic-value (second (car lst)))
+			(cons (list item item-heuristic-value listactions) lst) 
+			(cons (car lst) (insert item (cdr lst) item-heuristic-value listactions)))))
+
+; Procuras informadas: procura-A*
+; Implementado utilizando uma funcao auxiliar e de forma imperativa
+; problema - estrutura problema criada
+; heuristica - funcao heuristica usada para auxiliar a resolucao do problema
+; devolve uma lista de pecas com a primeira solucao encontrada.
+; cria uma lista de accoes para cada novo no aberto na fronteita.
 (defun procura-A* (problema h)
 
 	(let ((solucaop nil)
-	      (novalista '())
-	      (lista-accoes-solucoes '()))
+		(novalista '())
+		(lista-accoes-solucoes '()))
 
-		(defun procura-A*-aux (problema lista-accoes-solucoes)
-			(let* ((fronteira '())
-				   (novo-estado nil)
-				   (filho nil)
-				   (lista-accoes-novas nil))
-				(setf fronteira (list (list 
-					(problema-estado-inicial problema) 
-					(+ (funcall (problema-custo-caminho problema) (problema-estado-inicial problema)) 
-					(funcall h (problema-estado-inicial problema))) 
-					'())))
-				(loop for a from 0 to 1 until (equal fronteira '()) do
+	;funcao auxiliar - implementada de forma imperativa, com um ciclo infinito que interrompe
+	;caso se chegue a uma solucao
+	(defun procura-A*-aux (problema lista-accoes-solucoes)
+		(let* ((fronteira '())
+			(novo-estado nil)
+			(filho nil)
+			(lista-accoes-novas nil))
+		(setf fronteira (list (list 
+			(problema-estado-inicial problema) 
+			(+ (funcall (problema-custo-caminho problema) (problema-estado-inicial problema)) 
+				(funcall h (problema-estado-inicial problema))) 
+			'())))
+		(loop for a from 0 to 1 until (equal fronteira '()) do
+			(progn
+				(setf novo-estado (pop fronteira))
+				(setf filho nil)
+				(setf lista-accoes-novas (funcall (problema-accoes problema) (car novo-estado)))
+				(dolist (accao-actual lista-accoes-novas)
+					(setf filho (funcall (problema-resultado problema) (car novo-estado) accao-actual))
+					(setf lista-accoes-solucoes (append (third novo-estado) (list accao-actual)))
+					(setf fronteira (insert filho fronteira (+ (funcall (problema-custo-caminho problema) filho) (funcall h filho)) lista-accoes-solucoes))
+					)
+				(if (not (equal fronteira nil))
+					(if (funcall (problema-solucao problema) (car (car  fronteira)))
 						(progn
-							(setf novo-estado (pop fronteira))
-							(setf filho nil)
-							(setf lista-accoes-novas (funcall (problema-accoes problema) (car novo-estado)))
-							(dolist (accao-actual lista-accoes-novas)
-								(setf filho (funcall (problema-resultado problema) (car novo-estado) accao-actual))
-								(setf lista-accoes-solucoes (append (third novo-estado) (list accao-actual)))
-								(setf fronteira (insert filho fronteira (+ (funcall (problema-custo-caminho problema) filho) (funcall h filho)) lista-accoes-solucoes))
-								)
-								;(princ "a")
-								;(princ fronteira)
-								(if (not (equal fronteira nil))
-									(if (funcall (problema-solucao problema) (car (car  fronteira)))
-										(progn
-											;(princ "b")
-											(setf solucaop (third (car fronteira)))
-											(setf novalista solucaop)
-											(return novalista))))
-								(decf a)))))
-		(procura-A*-aux problema lista-accoes-solucoes)
-   		novalista))
+							(setf solucaop (third (car fronteira)))
+							(setf novalista solucaop)
+							(return novalista))))
+				(decf a)))))
+(procura-A*-aux problema lista-accoes-solucoes)
+novalista))
 
-
+; Procuras informadas: procura-best
+; Implementado utilizando uma funcao auxiliar e de forma imperativa.
+; tab-array - tabuleiro de jogo.
+; lista-pecas - lista de pecas a colocar no tabuleiro.
+; Cria um problema para o tabuleiro e lista recebidos, e chama a funcao A*
+; com uma heuristica custo-oportunidade modificada para ser mais rapida mas nao optima.
+; devolve uma lista de accoes a efectuar.
 (defun procura-best (tab-array lista-pecas)
-
-	(let* ((solucaop nil)
-	      (novalista '())
-	      ;(x 0)
-	      (h #'(lambda (x) (if (numberp x ) 0 0)))
-	      (estado-init (make-estado :pontos 0 :tabuleiro (tabuleiro->array tab-array) :pecas-colocadas () :pecas-por-colocar lista-pecas))
-	      (prob-init (make-problema :estado-inicial estado-init :solucao #'solucao :accoes #'accoes :resultado #'resultado :custo-caminho #'custo-oportunidade))
-	      (lista-accoes-solucoes '()))
-
-		(defun procura-b-aux (problema lista-accoes-solucoes)
-			(let* ((fronteira '())
-				   (novo-estado nil)
-				   (filho nil)
-				   (lista-accoes-novas nil))
-				(setf fronteira (list (list 
-					(problema-estado-inicial problema) 
-					(+ (funcall (problema-custo-caminho problema) (problema-estado-inicial problema)) 
-					(funcall h (problema-estado-inicial problema))) 
-					'())))
-				;(princ prob-init)
-				(loop for a from 0 to 1 until (equal fronteira '()) do
-						(progn
-							(setf novo-estado (pop fronteira))
-							(setf filho nil)
-							(setf lista-accoes-novas (funcall (problema-accoes problema) (car novo-estado)))
-							(dolist (accao-actual lista-accoes-novas)
-								(setf filho (funcall (problema-resultado problema) (car novo-estado) accao-actual))
-								(setf lista-accoes-solucoes (append (third novo-estado) (list accao-actual)))
-								(setf fronteira (insert filho fronteira (+ (funcall (problema-custo-caminho problema) filho) (funcall h filho)) lista-accoes-solucoes))
-								)
-								;(princ "a")
-								;(princ fronteira)
-								(if (not (equal fronteira nil))
-									(if (funcall (problema-solucao problema) (car (car  fronteira)))
-										(progn
-											;(princ "b")
-											(setf solucaop (third (car fronteira)))
-											(setf novalista solucaop)
-											;(setf x (+ x 1))
-											;(setf solucaop x)
-											(return novalista))))
-								(decf a)))))
-		(procura-b-aux prob-init lista-accoes-solucoes )
-   		novalista))
-
-
-; (defun tab-ex ()
-; 	(let ((a (cria-tabuleiro)))
-; 		(progn
-; 			(tabuleiro-preenche! a 1 0)
-; 			(tabuleiro-preenche! a 1 1)
-; 			(tabuleiro-preenche! a 1 2)
-; 			(tabuleiro-preenche! a 1 3)
-; 			(tabuleiro-preenche! a 1 4)
-; 			(tabuleiro-preenche! a 1 5)
-; 			(tabuleiro-preenche! a 1 6)
-; 			(tabuleiro-preenche! a 1 7)
-; 			(tabuleiro-preenche! a 1 8)
-; 			(tabuleiro-preenche! a 1 9)
-; 			(tabuleiro-preenche! a 17 0)
-; 			(tabuleiro-preenche! a 17 1)
-; 			(tabuleiro-preenche! a 17 2)
-; 			(tabuleiro-preenche! a 17 4)
-; 			(tabuleiro-preenche! a 17 6)
-; 			(tabuleiro-preenche! a 17 7)
-; 			(tabuleiro-preenche! a 17 8)
-; 			(tabuleiro-preenche! a 17 9)
-; 			(tabuleiro-preenche! a 3 0)
-; 			(tabuleiro-preenche! a 3 1)
-; 			(tabuleiro-preenche! a 4 9)
-; 			(tabuleiro-preenche! a 14 8)
-; 			(tabuleiro-preenche! a 14 9)
-; 			(tabuleiro-preenche! a 14 7)
-; 			(tabuleiro-preenche! a 3 1)
-; 			(tabuleiro-preenche! a 4 9)
-; 			a)))
-
- ;(setf t1 '#2A((T T T T NIL T T T T T)(T T T NIL NIL NIL T T T T)(T T T NIL NIL NIL T T T T)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)))
-; ;;deve retornar IGNORE
-; (dotimes (linha 17) (dotimes (coluna 8) (tabuleiro-preenche! t1 linha coluna))))
-; ;;deve retornar uma lista de accoes (ver ficheiro output)
- ;(setf p1 (make-problema :estado-inicial (make-estado :pontos 0 :tabuleiro t1 :pecas-colocadas () :pecas-por-colocar '(j i)) :solucao #'solucao :accoes #'accoes :resultado #'resultado :custo-caminho #'custo-oportunidade))
-; (set r1 (make-estado :pontos 0 :tabuleiro t1 :pecas-colocadas () :pecas-por-colocar '(j i)))
+	(let* (
+		  (novalista '())
+		  (h #'(lambda (x) (if (numberp x ) 0 0)))
+		  (estado-init (make-estado :pontos 0 :tabuleiro (tabuleiro->array tab-array) :pecas-colocadas () :pecas-por-colocar lista-pecas))
+		  (prob-init (make-problema :estado-inicial estado-init :solucao #'solucao :accoes #'accoes :resultado #'resultado :custo-caminho #'custo-oportunidade-cheap)))
+	(setf novalista (procura-A* prob-init h))
+	novalista))
 
 (load "utils.fas")
