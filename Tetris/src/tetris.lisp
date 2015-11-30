@@ -11,8 +11,8 @@
 (defparameter *num-linhas* 18)
 
 ;; Indices maximos das colunas e das linhas do tabuleiro
-(defparameter *max-colunas-index* (- *num-colunas* 1))
-(defparameter *max-linhas-index* (- *num-linhas* 1))
+(defparameter *max-colunas-index* 9)
+(defparameter *max-linhas-index* 17)
 
 ; Funcao auxiliar que mapeia a numeracao das linhas requerida no enunciado em que a linha 0 encontra-se 
 ; na posicaoo mais 'abaixo'
@@ -71,9 +71,8 @@
 ; linha --> inteiro [0,17] que representa a linha do tabuleiro
 ; coluna --> inteiro [0,9] que representa a coluna do tabuleiro
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
-		;(>= linha 0) (<= linha *max-linhas-index*)
-		;(>= coluna 0) (<= coluna *max-colunas-index*)
 		(not (equal (aref tabuleiro (maplinha linha) coluna) nil)))
+
 
 ; tabuleiro altura-coluna : tabuleiro x coluna --> inteiro que representa a linha mais elevada ocupada
 ;										 	       da coluna recebida
@@ -254,7 +253,8 @@
 ; accoes : estado -> lista de accoes
 ; Funcao que recebe um estado e devolve uma lista de accoes que podem ser feitas com a proxima peca a ser colocada
 (defun accoes (estado)
-	(if (estado-final-p estado)
+	(if (or (equal estado nil)
+			(estado-final-p estado))
 		nil
 		(let ((peca (first (estado-pecas-por-colocar estado)))
 			(lista-accoes '()))
@@ -296,9 +296,9 @@
 			(setf pecas-colocadas (cdr pecas-colocadas))))
 	(- pontos-totais pontos)))
 
-; custo-oportunidade : estado -> inteiro
+; custo-oportunidade-cheap : estado -> inteiro
 ; Devolve o custo de oportunidade de todas as accoes realizadas - da enfase a pecas que fazem varias linhas na vertical
-; como prioritarias e nao e admissivel, mas encontra solucoes rapidamente.
+; e com combos maiores como prioritarias e nao e admissivel, mas encontra solucoes rapidamente.
 (defun custo-oportunidade-cheap (estado)
 	(let* (
 		(pontos (estado-pontos estado))
@@ -392,13 +392,13 @@
             	((= conta-linhas-removidas 3) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 500)))
             	((= conta-linhas-removidas 2) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 300)))
             	((= conta-linhas-removidas 1) (setf (estado-pontos novo-estado) (+ (estado-pontos novo-estado) 100))))
+
             ;Actualizacao da lista de pecas colocadas e pecas por colocar
             (setf (estado-pecas-colocadas novo-estado) 
             	(cons (car (estado-pecas-por-colocar novo-estado)) 
             		(estado-pecas-colocadas novo-estado)))
             (setf (estado-pecas-por-colocar novo-estado)
             	(cdr (estado-pecas-por-colocar novo-estado))))
-
 novo-estado))
 
 ;;---------------------------------------------------------------------------------------------------------------
@@ -514,3 +514,4 @@ novalista))
 	novalista))
 
 (load "utils.fas")
+
