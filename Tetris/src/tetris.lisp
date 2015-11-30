@@ -52,7 +52,7 @@
 ; cria-tabuleiro 
 ; Retorna um array bidimensional (18 x 10) com todas as posicoes a nil
 (defun cria-tabuleiro ()
-	(make-array (list *num-linhas* *num-colunas*) :initial-element 'F))
+	(make-array (list *num-linhas* *num-colunas*) :initial-element nil))
 
 ; cria-accao : tabuleiro-a-copiar --> tabuleiro - copia do tabuleiro-a-copiar
 ; tabuleiro-a-copiar --> array bidimensional que representa o tabuleiro a ser copiado
@@ -73,7 +73,7 @@
 	(if (and (numberp linha) (numberp coluna)
 		(>= linha 0) (<= linha *max-linhas-index*)
 		(>= coluna 0) (<= coluna *max-colunas-index*))
-	(not (equal (aref tabuleiro (maplinha linha) coluna) 'F))))
+	(not (equal (aref tabuleiro (maplinha linha) coluna) nil))))
 
 ; tabuleiro altura-coluna : tabuleiro x coluna --> inteiro que representa a linha mais elevada ocupada
 ;										 	       da coluna recebida
@@ -123,7 +123,7 @@
 		(loop for linha-actual from linha-mapeada downto 0 do
 			(if (= linha-actual 0)
 				(loop  for coluna-actual from 0 to *max-colunas-index*  do
-					(setf (aref tabuleiro linha-actual coluna-actual) 'F))
+					(setf (aref tabuleiro linha-actual coluna-actual) nil))
 				(let ((linha-anterior (1- linha-actual)))
 					(loop for coluna-actual from 0 to *max-colunas-index*  do
 						(setf (aref tabuleiro linha-actual coluna-actual)
@@ -402,239 +402,44 @@
 
 	novalista))	
 	
-(defun insert (item lst item-heuristic-value)
+(defun insert (item lst item-heuristic-value listactions)
   (if (null lst)
-    (cons (cons item item-heuristic-value) lst)
-    (if (< item-heuristic-value (cdr (car lst)))
-          (cons (cons item item-heuristic-value) lst) 
-          (cons (car lst) (insert item (cdr lst) item-heuristic-value)))))
+    (cons (list item item-heuristic-value listactions) lst)
+    (if (< item-heuristic-value (second (car lst)))
+          (cons (list item item-heuristic-value listactions) lst) 
+          (cons (car lst) (insert item (cdr lst) item-heuristic-value listactions)))))
 
 (defun procura-A* (problema h)
 
-	(let ((solucao nil)
+	(let ((solucaop nil)
 	      (novalista '())
-	      (frontier)
 	      (lista-accoes-solucoes '()))
 
-		(defun procura-A*-aux (problema lista-accoes-solucoes frontier)
-			(let* ((resultado-recursivo lista-accoes-solucoes)
-				   (fronteira '())
-				   (lista-accoes-novas '())
-				   (novo-estado nil))
-				)
-
-				  ;(estado1 (if (not (equal nil frontier) (pop frontier) nil)))
-			;(princ "fronteira:")
-			(setf fronteira (list (cons (problema-estado-inicial problema) (+ (funcall (problema-custo-caminho problema) (problema-estado-inicial problema)) (funcall h (problema-estado-inicial problema))))))
-			;(princ (problema-estado-inicial problema))
-			;(princ (funcall h (problema-estado-inicial problema)))
-			;(push 'abc fronteira)
-			;(princ (car (car  fronteira)))
-
-			;(princ estado1))))
-				  ;(generated-states '())
-				  ;(accoes1 (reverse (funcall (problema-accoes problema) estado1)))
-				  ;(estado-pos nil))
-
-   			(if (funcall (problema-solucao problema) (car (car  fronteira)))
-					(progn
-					(princ "solucao"))
-
-					;(setf solucao T)
-					; 	(setf novalista (reverse resultado-recursivo)))
-					
-					(loop for a from 0 to 1 until (equal fronteira '()) do
+		(defun procura-A*-aux (problema lista-accoes-solucoes)
+			(let* ((fronteira '())
+				   (novo-estado nil)
+				   (filho nil)
+				   (lista-accoes-novas nil))
+				(setf fronteira (list (list 
+					(problema-estado-inicial problema) 
+					(+ (funcall (problema-custo-caminho problema) (problema-estado-inicial problema)) 
+					(funcall h (problema-estado-inicial problema))) 
+					'())))
+				(loop for a from 0 to 1 until (equal fronteira '()) do
 						(progn
-							;(princ "aksjdhkasjh")
-							(if (funcall (problema-solucao problema) (car (car  fronteira)))
-								(progn
-								;(princ (car (car  fronteira)))
-								;(return)
-								))
-							(setf novo-estado (car (pop fronteira)))
+							(setf novo-estado (pop fronteira))
 							(setf filho nil)
-							(setf lista-accoes-novas (reverse (funcall (problema-accoes problema) novo-estado)))
+							(setf lista-accoes-novas (reverse (funcall (problema-accoes problema) (car novo-estado))))
 							(dolist (accao-actual lista-accoes-novas)
-								;(princ lista-accoes-novas)
-								(setf filho (funcall (problema-resultado problema) novo-estado accao-actual))
-								(setf fronteira (insert filho fronteira (+  (funcall (problema-custo-caminho problema) filho) (funcall h filho))))
-								;(princ filho)
-								)
-							;(princ "-------
-
-
-
-
-
-
-
-
-
-
-							;	----------")
-							(if (funcall (problema-solucao problema) (car (car  fronteira)))
-							(progn
-								(princ (car (car  fronteira)))
-								(return)
-								))
-
-							(decf a)
-							)
-						)
-					)
-   			)
-					;	(setf frontier (insert () alista 9)))
-						; (if (equal solucao nil)
-						; 	(progn
-						; 		(setf estado-pos (funcall (problema-resultado problema) estado1 accao-actual))
-						; 		(setf (problema-estado-inicial problema) estado-pos)
-						; 		(setf lista-accoes-solucoes (append (list accao-actual) lista-accoes-solucoes))
-						; 		(procura-A*-aux problema lista-accoes-solucoes frontier)
-						; 		(setf lista-accoes-solucoes (cdr lista-accoes-solucoes))))))))
-
-	(procura-A*-aux problema lista-accoes-solucoes frontier)
-	
-	solucao))
-
-; (defun procura-best* (array-tab pecas-p-colocar)
-; 	(let ((a (list array-tab pecas-p-colocar)))
-; 		(setf a T)
-; 		a))
-
-; ; PRIORITY QUEUE
-; ; http://aima.cs.berkeley.edu/lisp/utilities/queue.lisp
-; ;(defun make-estrutura-ordenada () '())
-
-; (defun uiu ())
-
-
-; (defun make-estrutura-ordenada-insere (estrutura elemento predicado)
-; 	(if (null estrutura)
-; 		(push elemento estrutura)
-; 		(let ((n 0)
-; 			  (nova-estrutura '())
-; 			  (actual (car estrutura))
-; 			  (tam (length estrutura) 1)
-; 			  (if (<= (funcall predicado elemento) (funcall actual))
-; 			  	  (push elemento estrutura)))))
-; 				  (progn 
-; 				  	 	(setf nova-estrutura (cons actual nil))
-; 				  		(loop for idx from 1 to tam do
-; 				  			(if (<= (funcall predicado elemento) (funcall predicado actual))
-; 				  				(progn 
-; 				  					(setf nova-estrutura (append nova-estrutura elemento))
-; 				  					(setf (cdr nova-estrutura) )
-; 				  					)
-
-; 				  			)
-; 				  			(setf nova-estrutura (cons nova-estrutura actual nil))
-
-; 				  )
-; (defun lp (lista pred ele)
-; 	(if (null lista)
-; 		0
-; 		(let ((n nil)
-; 			  (ar 0)
-; 			  (actual (car estrutura))
-; 			  (tam (length estrutura))
-; 			  (loop for idx from 0 to tam 
-; 			  		until (>= (funcall pred actual) (funcall pred ele)) do
-; 			  		(progn 
-; 			  			(setf n (cdr estrutura))
-; 			  			(setf actual (car n))
-; 			  			(incf ar))))))
-; 	ar)
-
-;   ; 		(loop (when (> n 10) (return))
-;   ;   (print n) (prin1 (* n n))
-;   ;  (incf n)))
-;   ;		(dolist i)
- 
-
-
-
-; (defstruct node elt l r)
-
-
-;   (defun bst-insert (obj bst pred valorCalculado)
-;   	(if (null bst)
-;   		(make-node :elt obj)
-;   		(let ((elt (node-elt bst)))
-;   			(if (or (< (funcall pred obj) (funcall pred elt))
-;   					(equal (funcall pred obj) (funcall pred elt))
-;   				(make-node
-;   						:elt elt
-;   						:l (bst-insert obj (node-l bst) pred)
-;   						:r (node-r bst))
-;   				(make-node
-;   						:elt elt
-;   						:l (node-l bst)
-;   						:r (bst-insert obj (node-r bst) pred)))))))
-
-
-;   (defun print-tree (n)
-;   	(if (null n)
-;   		()
-;   		(progn
-;   			(format t "~A" (node-elt n))
-;   			(print-tree (node-l n))
-;   			(format t "r")
-;   			(print-tree (node-r n)))))
-
-
-;   (defun bst-find (obj bst <)
-;   	(if (null bst)
-;   		nil
-;   		(let ((elt (node-elt bst)))
-;   			(if (eql obj elt)
-;   				bst
-;   				(if (funcall < obj elt)
-;   					(bst-find obj (node-l bst) <)
-;   					(bst-find obj (node-r bst) <))))))
-
-
-;   (defun bst-min (bst)
-;   	(and bst
-;   		(or (bst-min (node-l bst)) bst)))
-
-;   (defun bst-max (bst)
-;   	(and bst
-;   		(or (bst-max (node-r bst)) bst)))
-  
-;   (defun bst-remove (obj bst <)
-;   	(if (null bst)
-;   		nil
-;   		(let ((elt (node-elt bst)))
-;   			(if (eql obj elt)
-;   				(percolate bst)
-;   				(if (funcall < obj elt)
-;   					(make-node
-;   						:elt elt
-;   						:l (bst-remove obj (node-l bst) <)
-;   						:r (node-r bst))
-;   					(make-node
-;   						:elt elt
-;   						:l (node-r bst)
-;   						:R (bst-remove obj (node-r bst) <)))))))
-
-; (defun percolate (bst)
-; 	(cond ((null (node-l bst))
-; 			(if (null (node-r bst))
-; 				nil
-; 				(rperc bst)))
-; 		   ((null (node-r bst)) (lperc bst))
-; 			(t (if (zerop (random 2))
-; 					(lperc bst)
-; 					(rperc bst)))))
-
-; (defun rperc (bst)
-; 		(make-node :elt (node-elt (node-l bst)) 
-; 				   :l (node-l bst)
-; 				   :r (percolate (node-r bst))))
-
-; (defun lperc (bst)
-; 			(make-node :elt (node-elt (node-l bst)) 
-; 						:l (percolate (node-l bst)) 
-; 						:r (node-r bst)))
-
-;(load "utils.fas")
+								(setf filho (funcall (problema-resultado problema) (car novo-estado) accao-actual))
+								(setf lista-accoes-solucoes (append (third novo-estado) (list accao-actual)))
+								(setf fronteira (insert filho fronteira (+ (funcall (problema-custo-caminho problema) filho) (funcall h filho)) lista-accoes-solucoes)))
+								(if (funcall (problema-solucao problema) (car (car  fronteira)))
+									(progn
+										(setf solucaop (third (car fronteira)))
+										(setf novalista solucaop)
+										(return novalista)))
+								(decf a)))))
+		(procura-A*-aux problema lista-accoes-solucoes)
+   		novalista))
+(load "utils.fas")
